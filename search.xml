@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>a</title>
+    <title>test</title>
     <url>/2020/10/30/a/</url>
     <content><![CDATA[]]></content>
+      <categories>
+        <category>study</category>
+      </categories>
+      <tags>
+        <tag>study notes</tag>
+      </tags>
   </entry>
 </search>
