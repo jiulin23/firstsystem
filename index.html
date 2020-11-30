@@ -209,10 +209,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2020-11-29 00:30:04 / 修改时间：11:21:23" itemprop="dateCreated datePublished" datetime="2020-11-29T00:30:04+08:00">2020-11-29</time>
+              <time title="创建时间：2020-11-29 00:30:04" itemprop="dateCreated datePublished" datetime="2020-11-29T00:30:04+08:00">2020-11-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-30 21:14:06" itemprop="dateModified" datetime="2020-11-30T21:14:06+08:00">2020-11-30</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -234,11 +240,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要总结sql注入相关的知识点。很多地方都写得比较基础，一来便于自己复习，二来需要查阅相关资料的人看到这篇文章理解也会比较方便。为了总结全面一点，文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发email联系我删除。多有不合理之处，望大佬指点。</p>
-<p>随时更新</p>
-<hr>
-<h2 id="MySQL注入原理"><a href="#MySQL注入原理" class="headerlink" title="MySQL注入原理"></a>MySQL注入原理</h2><p>造成原因即，由于一些程序或网站没能全面地过滤、拦截我们输入的数据，我们就可以利用在输入的数据中插入恶意语句，从而欺骗服务器来执行我们插入的sql语句，来获得数据库中的数据或者修改数据库。</p>
-<p>注入的步骤一般是，先通过用一些常见的尝试语句，如<code>&#39;or 1=1--+</code>来寻找注入点或者适合的注入方法，然后再去构造语句对数据库进行增、删、改，读写文件，或者是一步一步从数据库查询到我们想得到的字段数据来达成目的。</p>
+          <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要总结sql注入相关的知识点。很多地方都写得比较基础，一来便于自己复习，二来需要查阅相关资料的人看到这篇文章理解也会比较方便。为了总结全面一点，文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发email联系我删除。多有不合理之处，望大佬指点。
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/11/29/sqli/#more" rel="contents">
