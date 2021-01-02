@@ -29,14 +29,14 @@
 <meta property="og:site_name" content="無限可能">
 <meta property="og:description" content="前言本文主要总结文件包含漏洞和伪协议相关知识。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。  文件包含漏洞文件包含概述服务器执行PHP文件时，可以通过文件包含函数加载另一个文件中的PHP代码，并且当做PHP来执行，这会为开发者节省大量的时间。">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="d:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C1.png">
-<meta property="og:image" content="d:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C2.png">
-<meta property="og:image" content="d:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C3.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/1.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/3.png">
 <meta property="article:published_time" content="2021-01-02T06:21:53.000Z">
-<meta property="article:modified_time" content="2021-01-02T06:32:18.178Z">
+<meta property="article:modified_time" content="2021-01-02T06:47:57.181Z">
 <meta property="article:author" content="jiulin">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="d:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C1.png">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/1.png">
 
 <link rel="canonical" href="http://example.com/2021/01/02/php3/">
 
@@ -130,11 +130,6 @@
     <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
-
-  </li>
         <li class="menu-item menu-item-archives">
 
     <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
@@ -224,7 +219,7 @@
               <span class="post-meta-item-text">发表于</span>
               
 
-              <time title="创建时间：2021-01-02 14:21:53 / 修改时间：14:32:18" itemprop="dateCreated datePublished" datetime="2021-01-02T14:21:53+08:00">2021-01-02</time>
+              <time title="创建时间：2021-01-02 14:21:53 / 修改时间：14:47:57" itemprop="dateCreated datePublished" datetime="2021-01-02T14:21:53+08:00">2021-01-02</time>
             </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -267,7 +262,7 @@
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">phpinfo();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>然后我们包含<code>file.txt</code>文件：</p>
-<p><img src="D:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/1.png"></p>
 <p>如果包含的文件内容不符合php语言语法的，会直接将文件内容输出。</p>
 <p>像上面这样的漏洞叫做无限制本地文件包含漏洞。如果开发者做了一定的限制，如限制了包含文件的后缀，如下：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    $file = $_GET[<span class="string">&#x27;file&#x27;</span>] . <span class="string">&#x27;.php&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> $file;</span><br><span class="line">    <span class="keyword">include</span>($file);</span><br></pre></td></tr></table></figure>
@@ -289,7 +284,7 @@
 </blockquote>
 <p>由于我们可以通过<code>phpinfo</code>的信息来获取到session的存储位置，当其中的内容可控时，我们就可以将恶意代码存储到该目录下，从而getshell。</p>
 <p>通过phpinfo的信息，获取到session.save_path为/var/lib/php/session：</p>
-<p><img src="D:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/2.png"></p>
 <p>示例代码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">session_start();</span><br><span class="line">$ctfs=$_GET[<span class="string">&#x27;ctfs&#x27;</span>];</span><br><span class="line">$_SESSION[<span class="string">&quot;username&quot;</span>]=$ctfs;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
@@ -334,7 +329,7 @@
 
 <hr>
 <h1 id="伪协议"><a href="#伪协议" class="headerlink" title="伪协议"></a>伪协议</h1><p>PHP伪协议事实上就是支持的协议与封装协议，共十二种。</p>
-<p><img src="D:%5Cnews%5Cblog%5Csource%5C_posts%5Cphp3.assets%5C3.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/3.png"></p>
 <p>伪协议常常用于文件包含漏洞之中。</p>
 <p>以下总结部分常用的伪协议。</p>
 <h2 id="file"><a href="#file" class="headerlink" title="file://"></a>file://</h2><p>用于访问本地文件系统的文件。</p>
