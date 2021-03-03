@@ -338,6 +338,7 @@
 <p>可是我的xss平台总是拿不到cookie，换了很多个平台也没用，如下图：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.4.0/wp/hgame2021wp/8.png"></p>
 <p>到现在也不知道为什么。。。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>积累了不少的做题经验，看到题不会再到处瞎试了，也学了很多新知识，比如HTTP走私什么的。</p>
 ]]></content>
       <categories>
         <category>WP</category>
@@ -1062,7 +1063,7 @@
 <p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.1/php1/3.png"></p>
 <p>可以看到其中的一段序列化文本，就是<code>meta-data</code>序列化的结果。</p>
 <h3 id="phar-反序列化"><a href="#phar-反序列化" class="headerlink" title="phar://反序列化"></a><code>phar://</code>反序列化</h3><p>那么，如何利用<code>phar://</code>进行反序列化呢？</p>
-<p>使用<code>phra://</code>伪协议读取文件的时候，文件会被解析成phar对象，这个时候，刚才那部分的序列化的信息就会被反序列化。</p>
+<p>使用<code>phar://</code>伪协议读取文件的时候，文件会被解析成phar对象，这个时候，刚才那部分的序列化的信息就会被反序列化。</p>
 <figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="comment">#test.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="keyword">require_once</span>(<span class="string">&#x27;Evil.class.php&#x27;</span>);</span><br><span class="line"><span class="keyword">if</span> ( file_exists($_REQUEST[<span class="string">&#x27;url&#x27;</span>]) ) &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;success!&#x27;</span>;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">&#x27;error!&#x27;</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
 
 
