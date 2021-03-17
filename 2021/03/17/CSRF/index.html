@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="CSRF漏洞原理CSRF是跨站请求伪造，表面上与XSS相像，但XSS是利用合法用户获取其信息，而CSRF是伪造成合法用户，利用目标用户的合法身份(其实就是coookie)，以用户的名义执行某些非法操作(向服务器发送伪造请求)。 广义的CSRF是指CSRF不一定要借助受害用户的浏览器，黑客可以通过自己写一个脚本伪造出一个和真实的http请求一模一样的数据包发送给你的服务器，前提是你这个http接口中">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CSRF">
+<meta property="og:url" content="http://example.com/2021/03/17/CSRF/index.html">
+<meta property="og:site_name" content="無限可能">
+<meta property="og:description" content="CSRF漏洞原理CSRF是跨站请求伪造，表面上与XSS相像，但XSS是利用合法用户获取其信息，而CSRF是伪造成合法用户，利用目标用户的合法身份(其实就是coookie)，以用户的名义执行某些非法操作(向服务器发送伪造请求)。 广义的CSRF是指CSRF不一定要借助受害用户的浏览器，黑客可以通过自己写一个脚本伪造出一个和真实的http请求一模一样的数据包发送给你的服务器，前提是你这个http接口中">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-03-17T09:51:59.000Z">
+<meta property="article:modified_time" content="2021-03-17T10:00:04.810Z">
+<meta property="article:author" content="jiulin">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2021/03/17/CSRF/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>CSRF | 無限可能</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">無限可能</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人邮箱：985885413@qq.com</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/CSRF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="jiulin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="無限可能">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CSRF
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-17 17:51:59 / 修改时间：18:00:04" itemprop="dateCreated datePublished" datetime="2021-03-17T17:51:59+08:00">2021-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CSRF/" itemprop="url" rel="index"><span itemprop="name">CSRF</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h1><h1 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h1><p>CSRF是跨站请求伪造，表面上与XSS相像，但XSS是利用合法用户获取其信息，而CSRF是伪造成合法用户，利用目标用户的合法身份(其实就是coookie)，以用户的名义执行某些非法操作(向服务器发送伪造请求)。</p>
+<p>广义的CSRF是指CSRF不一定要借助受害用户的浏览器，黑客可以通过自己写一个脚本伪造出一个和真实的http请求一模一样的数据包发送给你的服务器，前提是你这个http接口中的所有参数都是可以预期的。</p>
+<h1 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h1><h2 id="cookie分类"><a href="#cookie分类" class="headerlink" title="cookie分类"></a>cookie分类</h2><p>浏览器持有的cookie有两种，一种是“Session Cookie”，临时Cookie;另一种是“Third-party Cookie”，本地Cookie。<a id="more"></a></p>
+<p>两者的区别在于，Third-party Cookie是服务器在Set-Cookie时指定了Expire时间，只有到了Expire时间后Cookie才会消失，所以这种Cookie会保存在本地；而Session Cookie则没有指定Expire时间，所以浏览器关闭后，Session Cookie就消失了。Session Cookie保存在浏览器进程的内存空间中，而Third-party Cookie则保存在本地。</p>
+<p>如果浏览器从一个域的页面中，要加载另一个域的资源，由于安全原因，某些浏览器会阻止Third-party Cookie的发送。</p>
+<h2 id="隐患"><a href="#隐患" class="headerlink" title="隐患"></a>隐患</h2><p>如果CSRF攻击的目标需要使用cookie，那么则必须具备这两种cookie，部分浏览器处于安全考虑，默认禁止了浏览器在 &lt;img&gt;、&lt;iframe&gt;、&lt;script&gt;等标签中发送第三方cookie。但是还是有存在一些浏览器默认策略是允许发送第三方cookie的，这就有可能导致CSRF攻击成功。</p>
+<h1 id="P3P"><a href="#P3P" class="headerlink" title="P3P"></a>P3P</h1><h2 id="P3P头"><a href="#P3P头" class="headerlink" title="P3P头"></a>P3P头</h2><p>P3P(The Platform forPrivacy Prefrences Project)是一种被称为个人隐私安全平台项目的标准，能够保护在线隐私权，使Internet冲浪者可以在选择浏览网页时，是否被第三方收集利用自己的个人信息。</p>
+<h2 id="隐患点"><a href="#隐患点" class="headerlink" title="隐患点"></a>隐患点</h2><p>设置了P3P头之后，对于cookie的影响会扩大到整个域中的所有页面。也就是说如果网站返回给浏览器的HTTP头中包含P3P头，将会允许浏览器发送第三方cookie</p>
+<p>P3P头的介入可能会改变网站的隐私策略，使得&lt;iframe&gt;、&lt;script&gt;等标签在ie中不再拦截第三方cookie的发送，造成CSRF漏洞。</p>
+<h1 id="产生条件"><a href="#产生条件" class="headerlink" title="产生条件"></a>产生条件</h1><ol>
+<li>用户在浏览器上登录自身信任网站a</li>
+<li>浏览器获得了服务器传给自己的cookie并保存。</li>
+<li>用户在网站a保持登录状态的情况下，打开了恶意网站b</li>
+<li>恶意网站b返回给用户一些攻击性代码，伪造用户向a网站发送请求</li>
+<li>携带着用户cookie信息的请求由网站b传给网站a，网站a接受到请求后以为是用户发起的请求，于是执行了恶意网站的恶意代码。</li>
+</ol>
+<h1 id="漏洞检测"><a href="#漏洞检测" class="headerlink" title="漏洞检测"></a>漏洞检测</h1><p>通常是由于服务端没有对请求头做严格过滤引起的。最简单的检测方法就是抓取一个正常请求的数据包，去掉Referer字段后再重新提交，如果该提交还有效，那么基本上可以确定存在CSRF漏洞。</p>
+<h1 id="漏洞分类"><a href="#漏洞分类" class="headerlink" title="漏洞分类"></a>漏洞分类</h1><h2 id="get型CSRF漏洞"><a href="#get型CSRF漏洞" class="headerlink" title="get型CSRF漏洞"></a>get型CSRF漏洞</h2><p>很多利用方法，各种标签都可以用。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">a</span> <span class="attr">herf</span>=<span class="string">&quot;http://jiulin.space/csrf.php?password=123&quot;</span>&gt;</span>伪造参数<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">iframe</span> <span class="attr">src</span>=<span class="string">&quot;http://jiulin.space/csrf.php?password=123&quot;</span> <span class="attr">style</span>=<span class="string">&quot;display:none&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">iframe</span>&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">&quot;http://jiulin.space/csrf.php?password=123&quot;</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="POST型CSRF"><a href="#POST型CSRF" class="headerlink" title="POST型CSRF"></a>POST型CSRF</h2><p>可以在页面构造好一个form表单，然后使用js自动提交这个表单，攻击者甚至可以将这个页面隐藏在一个不可见的iframe窗口中，那么整个自动提交表单的过程对于用户也是不可见的。</p>
+<h1 id="漏洞关键"><a href="#漏洞关键" class="headerlink" title="漏洞关键"></a>漏洞关键</h1><p>该漏洞攻击利用的核心是进行伪造请求，所以关键在于请求的参数和参数值，如果攻击者无法得知url的所有参数和参数值，那么就无谈构造一个伪造的请求。</p>
+<p>所以CSRF攻击成功的关键所在就在于重要操作的所有参数都是可以被猜测到的。</p>
+<h1 id="防御方法"><a href="#防御方法" class="headerlink" title="防御方法"></a>防御方法</h1><h2 id="加入验证码"><a href="#加入验证码" class="headerlink" title="加入验证码"></a>加入验证码</h2><p>在POST的基础上可以再加一个验证码，用户每次提交数据时都需要在表单中填写验证码，这个方案大幅度的降低CSRF攻击，一些简单的验证码可能会被hacker破解，但一般情况下，验证码是很难被破解的。</p>
+<h2 id="验证Referer"><a href="#验证Referer" class="headerlink" title="验证Referer"></a>验证Referer</h2><p>在验证时添加一个Referer，判断请求的来源地址是否是当前网页，如果是，则可以认为该请求是合法的，否则就拒绝用户请求。</p>
+<h2 id="Anti-CSRF-Token"><a href="#Anti-CSRF-Token" class="headerlink" title="Anti CSRF Token"></a>Anti CSRF Token</h2><p>CSRF攻击之所以能够成功，是因为攻击者可以伪造用户的请求，该请求中所有的用户验证信息都存在于cookie中，因此攻击者可以在不知道用户验证信息的情况下直接利用用户的cookie来通过安全验证。由此可知，抵御CSRF攻击的关键在于：在请求中放入攻击者所不能伪造的信息，并且该信总不存在于cookie之中。</p>
+<p>在开发过程中我们可以在HTTP请求中以参数的形式加入一个随机产生的token，并在服务端进行token校验，如果请求中没有token或者token内容不正确，则认为是CSRF攻击而拒绝该请求。</p>
+<h1 id="绕过姿势"><a href="#绕过姿势" class="headerlink" title="绕过姿势"></a>绕过姿势</h1><h2 id="绕过token"><a href="#绕过token" class="headerlink" title="绕过token"></a>绕过token</h2><h3 id="利用逻辑错误绕过"><a href="#利用逻辑错误绕过" class="headerlink" title="利用逻辑错误绕过"></a>利用逻辑错误绕过</h3><p>应用程序有可能会在token存在或不为空的情况下检测token的有效性，这种情况下我们发送的请求不包含token或token值为空是可能绕过CSRF的防御。</p>
+<h3 id="利用检测不严格绕过"><a href="#利用检测不严格绕过" class="headerlink" title="利用检测不严格绕过"></a>利用检测不严格绕过</h3><p>应用程序可能只检测token是否合法却不检测token是否与当前用户匹配，在难以获取受害者token值的情况下可以提交自己产生的token来绕过CSRF防御。</p>
+<h3 id="利用session固定绕过"><a href="#利用session固定绕过" class="headerlink" title="利用session固定绕过"></a>利用session固定绕过</h3><p>有时候站点使用一个双提交cookie作为一个CSRF的防御措施。这个表明这个请求需要包含一个cookie，其值为随机token值，且同时在请求参数中也有一个字段值为该随机token值。如果值相同，那么请求是合法的。这种防御形式是非常常见的。</p>
+<p>如果一个双提交cookie用在了防御措施中，那么这个应用有可能没有将有效的token保存在服务器端。所以它没有办法指定token是否合法，并且也有可能很少检查cookie中的token值和参数中token值是不是一样的。这代表你可以发送一个假token，然后仍然可以有效实施CSRF攻击。</p>
+<h3 id="利用XSS绕过"><a href="#利用XSS绕过" class="headerlink" title="利用XSS绕过"></a>利用XSS绕过</h3><p>利用xss漏洞获取其cookie，查看存储在其中的token。</p>
+<h2 id="绕过Referer"><a href="#绕过Referer" class="headerlink" title="绕过Referer"></a>绕过Referer</h2><h3 id="当Referer为空时"><a href="#当Referer为空时" class="headerlink" title="当Referer为空时"></a>当Referer为空时</h3><p>可以移除Referer字段：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">mata</span> <span class="attr">name</span> = <span class="string">&quot;referrer&quot;</span> <span class="attr">content</span> = <span class="string">&quot;no-referrer&quot;</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>可以利用一些伪协议如data:、ftp://等，使用这些伪协议时html页面向任何http站点提交请求的话，这些请求的referer都是空的。</p>
+<h3 id="针对白名单的绕过"><a href="#针对白名单的绕过" class="headerlink" title="针对白名单的绕过"></a>针对白名单的绕过</h3><p>判断referer是某域的情况下，可以尝试在referer的url中将受害者域名置于二级域名区域或url目录区域。</p>
+<p>判断referer是否存在某关键词，如果一个站点在referer字段中检测“jiulin.space”字段，那么可以构造“jiulin.space.hacker.com”或者“hacker.com/jiulin.space”来绕过。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/17/SSTI/" rel="prev" title="SSTI/python沙箱逃逸">
+      <i class="fa fa-chevron-left"></i> SSTI/python沙箱逃逸
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#CSRF"><span class="nav-number">1.</span> <span class="nav-text">CSRF</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%8E%9F%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">漏洞原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cookie"><span class="nav-number">3.</span> <span class="nav-text">Cookie</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cookie%E5%88%86%E7%B1%BB"><span class="nav-number">3.1.</span> <span class="nav-text">cookie分类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E6%82%A3"><span class="nav-number">3.2.</span> <span class="nav-text">隐患</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#P3P"><span class="nav-number">4.</span> <span class="nav-text">P3P</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#P3P%E5%A4%B4"><span class="nav-number">4.1.</span> <span class="nav-text">P3P头</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9A%90%E6%82%A3%E7%82%B9"><span class="nav-number">4.2.</span> <span class="nav-text">隐患点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BA%A7%E7%94%9F%E6%9D%A1%E4%BB%B6"><span class="nav-number">5.</span> <span class="nav-text">产生条件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%A3%80%E6%B5%8B"><span class="nav-number">6.</span> <span class="nav-text">漏洞检测</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E7%B1%BB"><span class="nav-number">7.</span> <span class="nav-text">漏洞分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#get%E5%9E%8BCSRF%E6%BC%8F%E6%B4%9E"><span class="nav-number">7.1.</span> <span class="nav-text">get型CSRF漏洞</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POST%E5%9E%8BCSRF"><span class="nav-number">7.2.</span> <span class="nav-text">POST型CSRF</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%85%B3%E9%94%AE"><span class="nav-number">8.</span> <span class="nav-text">漏洞关键</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%98%B2%E5%BE%A1%E6%96%B9%E6%B3%95"><span class="nav-number">9.</span> <span class="nav-text">防御方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A0%E5%85%A5%E9%AA%8C%E8%AF%81%E7%A0%81"><span class="nav-number">9.1.</span> <span class="nav-text">加入验证码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81Referer"><span class="nav-number">9.2.</span> <span class="nav-text">验证Referer</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Anti-CSRF-Token"><span class="nav-number">9.3.</span> <span class="nav-text">Anti CSRF Token</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%95%E8%BF%87%E5%A7%BF%E5%8A%BF"><span class="nav-number">10.</span> <span class="nav-text">绕过姿势</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%95%E8%BF%87token"><span class="nav-number">10.1.</span> <span class="nav-text">绕过token</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E9%80%BB%E8%BE%91%E9%94%99%E8%AF%AF%E7%BB%95%E8%BF%87"><span class="nav-number">10.1.1.</span> <span class="nav-text">利用逻辑错误绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%A3%80%E6%B5%8B%E4%B8%8D%E4%B8%A5%E6%A0%BC%E7%BB%95%E8%BF%87"><span class="nav-number">10.1.2.</span> <span class="nav-text">利用检测不严格绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8session%E5%9B%BA%E5%AE%9A%E7%BB%95%E8%BF%87"><span class="nav-number">10.1.3.</span> <span class="nav-text">利用session固定绕过</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8XSS%E7%BB%95%E8%BF%87"><span class="nav-number">10.1.4.</span> <span class="nav-text">利用XSS绕过</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%95%E8%BF%87Referer"><span class="nav-number">10.2.</span> <span class="nav-text">绕过Referer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BD%93Referer%E4%B8%BA%E7%A9%BA%E6%97%B6"><span class="nav-number">10.2.1.</span> <span class="nav-text">当Referer为空时</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%92%88%E5%AF%B9%E7%99%BD%E5%90%8D%E5%8D%95%E7%9A%84%E7%BB%95%E8%BF%87"><span class="nav-number">10.2.2.</span> <span class="nav-text">针对白名单的绕过</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="jiulin"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">jiulin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jiulin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

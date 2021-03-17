@@ -186,6 +186,160 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/CSRF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="jiulin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="無限可能">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/17/CSRF/" class="post-title-link" itemprop="url">CSRF</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-17 17:51:59 / 修改时间：18:00:04" itemprop="dateCreated datePublished" datetime="2021-03-17T17:51:59+08:00">2021-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CSRF/" itemprop="url" rel="index"><span itemprop="name">CSRF</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="CSRF"><a href="#CSRF" class="headerlink" title="CSRF"></a>CSRF</h1><h1 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h1><p>CSRF是跨站请求伪造，表面上与XSS相像，但XSS是利用合法用户获取其信息，而CSRF是伪造成合法用户，利用目标用户的合法身份(其实就是coookie)，以用户的名义执行某些非法操作(向服务器发送伪造请求)。</p>
+<p>广义的CSRF是指CSRF不一定要借助受害用户的浏览器，黑客可以通过自己写一个脚本伪造出一个和真实的http请求一模一样的数据包发送给你的服务器，前提是你这个http接口中的所有参数都是可以预期的。</p>
+<h1 id="Cookie"><a href="#Cookie" class="headerlink" title="Cookie"></a>Cookie</h1><h2 id="cookie分类"><a href="#cookie分类" class="headerlink" title="cookie分类"></a>cookie分类</h2><p>浏览器持有的cookie有两种，一种是“Session Cookie”，临时Cookie;另一种是“Third-party Cookie”，本地Cookie。
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/17/CSRF/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/SSTI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="jiulin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="無限可能">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2021/03/17/SSTI/" class="post-title-link" itemprop="url">SSTI/python沙箱逃逸</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-17 17:51:57 / 修改时间：18:00:53" itemprop="dateCreated datePublished" datetime="2021-03-17T17:51:57+08:00">2021-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="SSTI-python沙箱逃逸"><a href="#SSTI-python沙箱逃逸" class="headerlink" title="SSTI/python沙箱逃逸"></a>SSTI/python沙箱逃逸</h1><h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><p>ssti，即服务端模板注入，指攻击者能够使用本机模板语法将恶意有效负载注入模板中，然后在服务器端执行该模板。主要为python的一些框架 jinja2 mako tornado django，PHP框架smarty twig，java框架jade velocity等等使用了渲染函数时，由于代码不规范或信任了用户输入而导致了服务端模板注入，模板渲染其实并没有漏洞，究其原因是程序员对代码不规范不严谨，导致了用户输入被串联到模板中而不是作为数据传递，才造成了模板注入漏洞，造成模板可控。</p>
+<h2 id="模板引擎"><a href="#模板引擎" class="headerlink" title="模板引擎"></a>模板引擎</h2><p>模板是一种提供给程序来解析的一种语法，换句话说，模板是把数据（变量）变成视觉表现（HTML代码）的实现手段，而这种手段不论在前端还是后端都有应用。</p>
+<p>通俗点说就是，拿到数据，放到模板里面，然后让渲染引擎将这些东西生成为html的文本，返回给浏览器。这样做的好处是可以大大提升效率。
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2021/03/17/SSTI/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/02/buuctfwp/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -209,10 +363,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-03-02 21:59:50 / 修改时间：22:03:48" itemprop="dateCreated datePublished" datetime="2021-03-02T21:59:50+08:00">2021-03-02</time>
+              <time title="创建时间：2021-03-02 21:59:50" itemprop="dateCreated datePublished" datetime="2021-03-02T21:59:50+08:00">2021-03-02</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-04 11:06:25" itemprop="dateModified" datetime="2021-03-04T11:06:25+08:00">2021-03-04</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -234,7 +394,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p>此为个人的解题记录，为记录方便，尽量不截图，不复述原题，随时更新。</p>
+          <p>此为个人的解题记录，只记录认为值得记录的题目。为记录方便，尽量不截图，不复述原题，随时更新。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2021/03/02/buuctfwp/#more" rel="contents">
@@ -367,10 +527,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2021-01-23 11:09:32 / 修改时间：11:19:18" itemprop="dateCreated datePublished" datetime="2021-01-23T11:09:32+08:00">2021-01-23</time>
+              <time title="创建时间：2021-01-23 11:09:32" itemprop="dateCreated datePublished" datetime="2021-01-23T11:09:32+08:00">2021-01-23</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-17 17:45:59" itemprop="dateModified" datetime="2021-03-17T17:45:59+08:00">2021-03-17</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -453,7 +619,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-23 11:24:24" itemprop="dateModified" datetime="2021-01-23T11:24:24+08:00">2021-01-23</time>
+                <time title="修改时间：2021-03-08 21:31:28" itemprop="dateModified" datetime="2021-03-08T21:31:28+08:00">2021-03-08</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -536,7 +702,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-01-23 11:24:38" itemprop="dateModified" datetime="2021-01-23T11:24:38+08:00">2021-01-23</time>
+                <time title="修改时间：2021-03-17 17:29:59" itemprop="dateModified" datetime="2021-03-17T17:29:59+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -619,7 +785,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2021-03-03 20:18:06" itemprop="dateModified" datetime="2021-03-03T20:18:06+08:00">2021-03-03</time>
+                <time title="修改时间：2021-03-17 17:26:26" itemprop="dateModified" datetime="2021-03-17T17:26:26+08:00">2021-03-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -644,7 +810,8 @@
       
           <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>​    本文主要总结php反序列化漏洞。为了总结全面一点，文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
 <hr>
-<h1 id="反序列化原理"><a href="#反序列化原理" class="headerlink" title="反序列化原理"></a>反序列化原理</h1><p>PHP序列化和反序列化主要是通过<code>serialize</code>  、<code>unserialize</code> 两个函数来分别实现，序列化就是将对象转换为可保存或传输的字符串的格式，反序列化就是把字符串格式恢复回原本的对象。在PHP中，序列化和反序列化一般用做缓存，比如session缓存，cookie等。
+<h1 id="反序列化漏洞利用原理"><a href="#反序列化漏洞利用原理" class="headerlink" title="反序列化漏洞利用原理"></a>反序列化漏洞利用原理</h1><p>在反序列化时，由于代码中出现了危险函数，导致我们可以通过调用方法来利用危险函数进行恶意攻击，造成代码执行，getshell等一系列不可控的后果。</p>
+<h1 id="反序列化"><a href="#反序列化" class="headerlink" title="反序列化"></a>反序列化</h1><p>PHP序列化和反序列化主要是通过<code>serialize</code>  、<code>unserialize</code> 两个函数来分别实现，序列化就是将对象转换为可保存或传输的字符串的格式，反序列化就是把字符串格式恢复回原本的对象。在PHP中，序列化和反序列化一般用做缓存，比如session缓存，cookie等。
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2020/12/26/php1/#more" rel="contents">
@@ -901,14 +1068,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">7</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
   </nav>

