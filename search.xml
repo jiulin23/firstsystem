@@ -49,6 +49,23 @@
       </categories>
   </entry>
   <entry>
+    <title>初。</title>
+    <url>/2020/11/06/chu/</url>
+    <content><![CDATA[<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;故事要从我的童年讲起。</br></br><a id="more"></a></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;童年的天真烂漫总让人喜欢畅想，小时候的我总梦想着能够成为飞行员，开飞机在云彩间穿梭，不然就去当个黑客，那得有多帅啊！白驹过隙，转眼即将成年，身体条件早已将我飞行员的梦了结，黑客什么的也不过是虚无缥缈的遐想罢了，毕竟我都没见过黑客。在对未来人生的规划中，我没再想过自己喜欢什么，只在计算什么专业分数高，什么岗位薪资好，什么能让我日后的生活更平坦更轻松。有趣的事，高考的小失利打乱了我原本的志愿，学校专业都不得已重新选择。在这样的情况下，阴差阳错般，我进入了成信的信安，遥远的梦想又被上天有些调皮地拉进了我的现实生活。</br></br><br>或许是初心迷失太久了，它也在突然的光亮中惊喜着，期待着，从而给了我向前的动力。我自己在心底暗暗较劲：决不能浪费这样的缘分。抱着这样的信念，我第一次踏进了大学校园，第一次真正了解信安。这里不仅有许多早有基础的大佬入学，两个技术小组更是被大家津津乐道。这些都让我对信安更加好奇。这种感觉，就好似是，蒙纱的维纳斯终于轻轻揭面，可你仍然看不透她，她的深邃让你有点害怕，但也更让你好奇。我是一个内向的人，可我更是一个争强的人，自己没基础，就赶快补起来，我要努力迎头赶上。c语言老师讲得慢，我就自己努力往后学，不知道学习的方向，就放下自己的腼腆去问学长们。syc和dog3的招新让很多零基础（以及腼腆）的同学望而却步，可我却偏要去试试。</br></br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;终于，不善言语的我”艰难“通过了两个小组“有嘴就行”的一面。我当然知道漫漫长路才刚刚开始，一点放松都不能有，所以dog3刚发了任务，我来不及惊讶任务的繁重，赶快进入了学习状态。讲真的，我性格一直比较随性，很少会很坚决地去努力做一件事，即使高考也只是尽尽力，从没有做到过别人那样挑灯夜战、悬梁刺股。但这次不同，或许是平生第一次真切的感受到了命运阴差阳错的眷顾，我多少有些亢奋，不愿辜负这一次机会，所以这次才如此认真。</br></br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;万事开头难，这句话是SQL注入教会我的。65关的靶场两周完成，这还没算别的任务，对于零基础的我来说，时间真的很紧张。可大家都在学，像我这种起跑线就落后了的小白，更是会心急如焚。可是，越心急越干不了大事，我赶着往前学的同时却又害怕着自己基础不牢学成空中楼阁，更害怕自己落下了平时的课（因为大一课还是挺多的），到时候考试一窍不通，技术学不来又挂了科。结果就是，好几天过去了，我却还停留在第八关。朝着未来，独自走上陌生的路，我好像就这样轻易地被困在了手铐里，束手无策。</br></br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;入夜，终点遥遥无期，我似乎耗尽了刚开始的那阵热情，想寻光，抬头却不见月，只悬着一轮圆形生铁，让人心头不安。</br></br></br></br></br></br></br></p>
+<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可这离第九百步还很远。</strong></br></br></br></br></br></p>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;充实的日子总是过得快，转眼间，秒针已经转到了十四天的末尾，我也算是勉勉强强坚持了下来，跌跌撞撞地完成了任务。小组的考察会很长，之后的相当一段时间，我都将陷入忙碌。平日里身为老退堂鼓艺术家的我竟没有一丝焦虑。这大概就是人们都在追求的人生意义吧，我之前不懂他们的执着，今日自己身在局中才终于理解：</br></br></p>
+<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;道阻且长呢，没有光，就得学着自己打开手电筒。</br></br></br></br></br></br></br></br></strong></p>
+<p>2020年11月6日记。</br></p>
+]]></content>
+      <categories>
+        <category>study notes</category>
+      </categories>
+  </entry>
+  <entry>
     <title>SSTI/python沙箱逃逸</title>
     <url>/2021/03/17/SSTI/</url>
     <content><![CDATA[<h1 id="SSTI-python沙箱逃逸"><a href="#SSTI-python沙箱逃逸" class="headerlink" title="SSTI/python沙箱逃逸"></a>SSTI/python沙箱逃逸</h1><h2 id="漏洞成因"><a href="#漏洞成因" class="headerlink" title="漏洞成因"></a>漏洞成因</h2><p>ssti，即服务端模板注入，指攻击者能够使用本机模板语法将恶意有效负载注入模板中，然后在服务器端执行该模板。主要为python的一些框架 jinja2 mako tornado django，PHP框架smarty twig，java框架jade velocity等等使用了渲染函数时，由于代码不规范或信任了用户输入而导致了服务端模板注入，模板渲染其实并没有漏洞，究其原因是程序员对代码不规范不严谨，导致了用户输入被串联到模板中而不是作为数据传递，才造成了模板注入漏洞，造成模板可控。</p>
@@ -437,23 +454,6 @@
 ]]></content>
       <categories>
         <category>WP</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>初。</title>
-    <url>/2020/11/06/chu/</url>
-    <content><![CDATA[<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;故事要从我的童年讲起。</br></br><a id="more"></a></p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;童年的天真烂漫总让人喜欢畅想，小时候的我总梦想着能够成为飞行员，开飞机在云彩间穿梭，不然就去当个黑客，那得有多帅啊！白驹过隙，转眼即将成年，身体条件早已将我飞行员的梦了结，黑客什么的也不过是虚无缥缈的遐想罢了，毕竟我都没见过黑客。在对未来人生的规划中，我没再想过自己喜欢什么，只在计算什么专业分数高，什么岗位薪资好，什么能让我日后的生活更平坦更轻松。有趣的事，高考的小失利打乱了我原本的志愿，学校专业都不得已重新选择。在这样的情况下，阴差阳错般，我进入了成信的信安，遥远的梦想又被上天有些调皮地拉进了我的现实生活。</br></br><br>或许是初心迷失太久了，它也在突然的光亮中惊喜着，期待着，从而给了我向前的动力。我自己在心底暗暗较劲：决不能浪费这样的缘分。抱着这样的信念，我第一次踏进了大学校园，第一次真正了解信安。这里不仅有许多早有基础的大佬入学，两个技术小组更是被大家津津乐道。这些都让我对信安更加好奇。这种感觉，就好似是，蒙纱的维纳斯终于轻轻揭面，可你仍然看不透她，她的深邃让你有点害怕，但也更让你好奇。我是一个内向的人，可我更是一个争强的人，自己没基础，就赶快补起来，我要努力迎头赶上。c语言老师讲得慢，我就自己努力往后学，不知道学习的方向，就放下自己的腼腆去问学长们。syc和dog3的招新让很多零基础（以及腼腆）的同学望而却步，可我却偏要去试试。</br></br></p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;终于，不善言语的我”艰难“通过了两个小组“有嘴就行”的一面。我当然知道漫漫长路才刚刚开始，一点放松都不能有，所以dog3刚发了任务，我来不及惊讶任务的繁重，赶快进入了学习状态。讲真的，我性格一直比较随性，很少会很坚决地去努力做一件事，即使高考也只是尽尽力，从没有做到过别人那样挑灯夜战、悬梁刺股。但这次不同，或许是平生第一次真切的感受到了命运阴差阳错的眷顾，我多少有些亢奋，不愿辜负这一次机会，所以这次才如此认真。</br></br></p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;万事开头难，这句话是SQL注入教会我的。65关的靶场两周完成，这还没算别的任务，对于零基础的我来说，时间真的很紧张。可大家都在学，像我这种起跑线就落后了的小白，更是会心急如焚。可是，越心急越干不了大事，我赶着往前学的同时却又害怕着自己基础不牢学成空中楼阁，更害怕自己落下了平时的课（因为大一课还是挺多的），到时候考试一窍不通，技术学不来又挂了科。结果就是，好几天过去了，我却还停留在第八关。朝着未来，独自走上陌生的路，我好像就这样轻易地被困在了手铐里，束手无策。</br></br></p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;入夜，终点遥遥无期，我似乎耗尽了刚开始的那阵热情，想寻光，抬头却不见月，只悬着一轮圆形生铁，让人心头不安。</br></br></br></br></br></br></br></p>
-<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;可这离第九百步还很远。</strong></br></br></br></br></br></p>
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;充实的日子总是过得快，转眼间，秒针已经转到了十四天的末尾，我也算是勉勉强强坚持了下来，跌跌撞撞地完成了任务。小组的考察会很长，之后的相当一段时间，我都将陷入忙碌。平日里身为老退堂鼓艺术家的我竟没有一丝焦虑。这大概就是人们都在追求的人生意义吧，我之前不懂他们的执着，今日自己身在局中才终于理解：</br></br></p>
-<p><strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;道阻且长呢，没有光，就得学着自己打开手电筒。</br></br></br></br></br></br></br></br></strong></p>
-<p>2020年11月6日记。</br></p>
-]]></content>
-      <categories>
-        <category>study notes</category>
       </categories>
   </entry>
   <entry>
@@ -1096,175 +1096,6 @@
       </categories>
   </entry>
   <entry>
-    <title>文件上传漏洞总结</title>
-    <url>/2021/01/02/php2/</url>
-    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要总结文件上传漏洞。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
-<hr>
-<h1 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h1><p>文件上传漏洞非常常见，是web安全中经常利用的一种漏洞形式。我们经常可以见到在web应用程序中，许多都会允许上传图片、文本或者其他资源到指定的位置，文件上传漏洞就是通过利用这些可以上传的地方，将恶意代码植入到服务器中，再通过url去访问，从而执行代码来达到恶意攻击的目的。造成文件上传漏洞的原因有很多，比如对上传文件的后缀或扩展名没有做较为严格的限制，对于上传文件的<code>MIMETYPE</code>没有做检查，又或者没有限制对于上传的文件的文件权限，都有可能会导致文件上传漏洞。<a id="more"></a></p>
-<hr>
-<h1 id="漏洞常见类型"><a href="#漏洞常见类型" class="headerlink" title="漏洞常见类型"></a>漏洞常见类型</h1><h2 id="基于文件校验的漏洞"><a href="#基于文件校验的漏洞" class="headerlink" title="基于文件校验的漏洞"></a>基于文件校验的漏洞</h2><h3 id="客户端检测"><a href="#客户端检测" class="headerlink" title="客户端检测"></a>客户端检测</h3><h4 id="js前端验证"><a href="#js前端验证" class="headerlink" title="js前端验证"></a>js前端验证</h4><p>前端一般会用JS函数来验证上传文件的扩展名之类的操作，相比起安全措施，这更像是一种防止用户上传操作失误的措施，我们直接删除掉JS代码，或者使用burp一类的工具进行改包，就可以绕过这类验证。</p>
-<h3 id="服务端检测"><a href="#服务端检测" class="headerlink" title="服务端检测"></a>服务端检测</h3><h4 id="检查后缀-扩展名"><a href="#检查后缀-扩展名" class="headerlink" title="检查后缀/扩展名"></a>检查后缀/扩展名</h4><p>对于在服务端进行扩展名检查的，一般分为两种：黑名单和白名单，其中后者相对更安全一点，不容易出现疏漏。</p>
-<h5 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h5><h5 id="寻找可解析后缀"><a href="#寻找可解析后缀" class="headerlink" title="寻找可解析后缀"></a>寻找可解析后缀</h5><p>利用burpsuite工具截断HTTP请求，利用intruder模块进行枚举后缀名，来寻找黑名单中是否存在没有过滤到的后缀名。</p>
-<p>常见的可解析后缀名有：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.php1&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.pHp1&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.ini&quot;</span><br></pre></td></tr></table></figure>
-
-
-
-<h5 id="htaccess"><a href="#htaccess" class="headerlink" title=".htaccess"></a><code>.htaccess</code></h5><blockquote>
-<p>.htaccess文件是Apache服务器中的一个配置文件，它负责相关目录下的网页配置.通过htaccess文件，可以实现:网页301重定向、自定义404页面、改变文件扩展名、允许/阻止特定的用户或者目录的访问、禁止目录列表、配置默认文档等功能。</p>
-<p>在apache中，如果需要启动.htaccess，必须在http.conf中设置AllowOverride为All。</p>
-</blockquote>
-<p>如果我们上传一个<code>.htaccess</code>，其内容为：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SetHandler application&#x2F;x-httpd-php</span><br></pre></td></tr></table></figure>
-
-<p>这样的话所有文件都会被解析为php。</p>
-<p>注意由于直接创建txt文档会显示必须键入文件名，所以可以采用cmd命令方式来生成<code>.htaccess</code>。</p>
-<h5 id="利用各类符号绕过后缀名"><a href="#利用各类符号绕过后缀名" class="headerlink" title="利用各类符号绕过后缀名"></a>利用各类符号绕过后缀名</h5><p>当这些后缀都被拉入黑名单时，我们可以考虑用大小写、双写、点号等方式来绕过。大小写、双写、结尾加空格等常规方式就不再赘述，主要说一下点绕过、<code>::$DATA</code>绕过、路径拼接绕过这些绕过方法。</p>
-<h6 id="点绕过"><a href="#点绕过" class="headerlink" title="点绕过"></a>点绕过</h6><p>windows系统下，后缀名的最后一个点会被自动删除掉，所以可以通过在结尾加一个点的方式绕过黑名单。</p>
-<h6 id="DATA绕过"><a href="#DATA绕过" class="headerlink" title="::$DATA绕过"></a><code>::$DATA</code>绕过</h6><blockquote>
-<p>是Windows下NTFS文件系统的一个特性，即NTFS文件系统的存储数据流的一个属性 DATA 时，就是请求 <code>a.asp</code> 本身的数据，如果a.asp 还包含了其他的数据流，比如 <code>a.asp:lake2.asp</code>，请求 <code>a.asp:lake2.asp::$DATA</code>，则是请求<code>a.asp</code>中的流数据<code>lake2.asp</code>的流数据内容。</p>
-</blockquote>
-<p>因此我们在后缀名中添加<code>::$DATA</code>即可绕过。</p>
-<p>注意要在Linux下修改文件名，因为在Windows下创建不了。</p>
-<h6 id="路径拼接绕过"><a href="#路径拼接绕过" class="headerlink" title="路径拼接绕过"></a>路径拼接绕过</h6><p>示例：</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        $deny_ext = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        $file_name = trim($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        $file_name = deldot($file_name);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        $file_ext = strrchr($file_name, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        $file_ext = strtolower($file_ext); <span class="comment">//转换为小写</span></span><br><span class="line">        $file_ext = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, $file_ext);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        $file_ext = trim($file_ext); <span class="comment">//首尾去空</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!in_array($file_ext, $deny_ext)) &#123;</span><br><span class="line">            $temp_file = $_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            $img_path = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.$file_name;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file($temp_file, $img_path)) &#123;</span><br><span class="line">                $is_upload = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $msg = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $msg = <span class="string">&#x27;此文件类型不允许上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $msg = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>可以看到这里对文件名进行了处理，删除了文件名末尾的点，并且把处理过的文件名拼接到路径中。</p>
-<p>这里我们就可以将文件名构造为  <code>1.php. .</code>  （点+空格+点），这样在路径拼接之后，文件名就会变成<code>1.php</code>，从而成功绕过。</p>
-<h5 id="白名单"><a href="#白名单" class="headerlink" title="白名单"></a>白名单</h5><h5 id="MIME绕过"><a href="#MIME绕过" class="headerlink" title="MIME绕过"></a>MIME绕过</h5><blockquote>
-<p>MIME（Multipurpose Internet Mail Extensions）多用途互联网邮件扩展类型。是设定某种扩展名的文件用一种应用程序来打开的方式类型，当改扩展名文件被访问的时候，浏览器会自动使用指定应用程序来打开，多用于指定一些客户端自定义的文件夹，以及一些媒体文件打开方式。</p>
-</blockquote>
-<p>我们来看一个示例：</p>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;type&#x27;</span>] == <span class="string">&#x27;image/jpeg&#x27;</span>) || ($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;type&#x27;</span>] == <span class="string">&#x27;image/png&#x27;</span>) || ($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;type&#x27;</span>] == <span class="string">&#x27;image/gif&#x27;</span>)) &#123;</span><br><span class="line">            $temp_file = $_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            $img_path = UPLOAD_PATH . <span class="string">&#x27;/&#x27;</span> . $_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>];          </span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file($temp_file, $img_path)) &#123;</span><br><span class="line">                $is_upload = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $msg = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $msg = <span class="string">&#x27;文件类型不正确，请重新上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $msg = UPLOAD_PATH.<span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
-
-<p>在这里我们检查<code>Content-type</code>，burp抓包修改其类型即可绕过。</p>
-<p>  <code>Content-type</code>常见类型见下：</p>
-<table>
-<thead>
-<tr>
-<th>文件类型</th>
-<th>Content-type</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>超文本标记语言文本</td>
-<td>.html,.html text/html</td>
-</tr>
-<tr>
-<td>普通文本</td>
-<td>.txt text/plain</td>
-</tr>
-<tr>
-<td>RTF文本</td>
-<td>.txt text/plain</td>
-</tr>
-<tr>
-<td>GIF图形</td>
-<td>.gif image/gif</td>
-</tr>
-<tr>
-<td>JPEG图形</td>
-<td>.jpeg,.jpg image/jpeg</td>
-</tr>
-<tr>
-<td>au声音文件</td>
-<td>.au audio/basic</td>
-</tr>
-<tr>
-<td>MIDI音乐文件</td>
-<td>.mid,.midi audio/midi,audio/x-midi</td>
-</tr>
-<tr>
-<td>RealAudio音乐文件</td>
-<td>.ra, .ram audio/x-pn-realaudio</td>
-</tr>
-<tr>
-<td>MPEG文件</td>
-<td>.mpg,.mpeg video/mpeg</td>
-</tr>
-<tr>
-<td>AVI文件</td>
-<td>.avi video/x-msvideo</td>
-</tr>
-<tr>
-<td>GZIP文件</td>
-<td>.gz application/x-gzip</td>
-</tr>
-<tr>
-<td>TAR文件</td>
-<td>.tar application/x-tar</td>
-</tr>
-</tbody></table>
-<h5 id="00截断"><a href="#00截断" class="headerlink" title="00截断"></a>00截断</h5><p>00截断是很常见的截断方法，原理是有些函数处理时，会把这个字符当作结束符。</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">截断条件：php版本小于5.3.4，php的magic_quotes_gpc为OFF状态</span><br></pre></td></tr></table></figure>
-
-<p>如：1.php0x00.jpg</p>
-<p>值得注意的是，在GET型00截断中，我们要使用<code>%00</code>来截断，因为GET型提交的内容会被自动进行URL解码；而在POST型00截断中，<code>%00</code>是不会被自动解码的，我们需要在16进制中对其进行修改，将其改为00即可截断。</p>
-<h4 id="检查内容"><a href="#检查内容" class="headerlink" title="检查内容"></a>检查内容</h4><h5 id="文件幻数-文件头检测"><a href="#文件幻数-文件头检测" class="headerlink" title="文件幻数/文件头检测"></a>文件幻数/文件头检测</h5><p>文件幻数是用来唯一标识文件类型的一系列数字（十六进制），也就是我们常说的文件头，当白名单限制了文件幻数时，我们就要给我们的文件制造可以过关的文件头：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.jpg	Value &#x3D; FF D8 FF E0 </span><br><span class="line">.gif	Value &#x3D; 47 49 46 38</span><br><span class="line">.png	Value &#x3D; 89 50 4E 47</span><br><span class="line">.html	Value &#x3D; 68 74 6D 6C 3E 10</span><br><span class="line">.xml	Value &#x3D; 3C 3F 78 6D 6C</span><br></pre></td></tr></table></figure>
-
-<p>然后在文件幻数之后加上我们要的木马就好了。</p>
-<h5 id="制作图片马"><a href="#制作图片马" class="headerlink" title="制作图片马"></a>制作图片马</h5><p>当服务端会对文件进行加载测试、渲染测试时，我们就可以将我们的代码注入到图片中，这样就不会破坏文件的格式，从而在白名单允许的图片格式范围内成功插入php代码，然后再利用文件包含来执行该代码。</p>
-<p>一句话木马（webshell）中常用的危险函数有<code>eval()</code> 、 <code>assert()</code> 、 <code>preg_replace()</code> ：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpupdate/1.png"></p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpupdate/2.png"></p>
-<p>制作方法：</p>
-<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpupdate/3.png"></p>
-<blockquote>
-<p>​    文件包含漏洞请见：<a href="https://jiulin.space/2021/01/02/php3/#more">https://jiulin.space/2021/01/02/php3/#more</a></p>
-</blockquote>
-<h2 id="基于文件处理的漏洞"><a href="#基于文件处理的漏洞" class="headerlink" title="基于文件处理的漏洞"></a>基于文件处理的漏洞</h2><h3 id="条件竞争"><a href="#条件竞争" class="headerlink" title="条件竞争"></a>条件竞争</h3><p>当网站的文件上传的过程是：<code>服务器获取文件–&gt;保存上传临时文件–&gt;重命名移动临时文件</code> 这样的步骤时，</p>
-<p>我们就可以使用条件竞争来进行绕过，通过不断地对文件进行上传和打开，从而使服务器还未重命名移动临时文件时，我们就利用时间差打开了文件，成功执行其中的php代码。</p>
-<p>具体方法：我们可以利用burp不断发包来进行条件竞争，也可以通过python脚本来反复发送请求得到结果。 </p>
-<h3 id="二次渲染"><a href="#二次渲染" class="headerlink" title="二次渲染"></a>二次渲染</h3><blockquote>
-<p>二次渲染，相当于把原本属于图像数据的部分抓了出来，再用自己的API 或函数进行重新渲染。在该过程中，非图像数据的部分与图像数据会被隔离开。</p>
-</blockquote>
-<p>方法也很简单，我们在十六进制中寻找二次渲染并未改变的部分，在其中插入php代码就好了。</p>
-<h2 id="基于文件解析的漏洞"><a href="#基于文件解析的漏洞" class="headerlink" title="基于文件解析的漏洞"></a>基于文件解析的漏洞</h2><h3 id="IIS篇"><a href="#IIS篇" class="headerlink" title="IIS篇"></a>IIS篇</h3><h4 id="；截断"><a href="#；截断" class="headerlink" title="；截断"></a>；截断</h4><p>当文件名为abc.asp;xx.jpg时，IIS6会将此文件解析成abc.asp，文件名被截断了，从而导致脚本被执行。</p>
-<h4 id="处理文件夹拓展名出错"><a href="#处理文件夹拓展名出错" class="headerlink" title="处理文件夹拓展名出错"></a>处理文件夹拓展名出错</h4><p>在IIS6.0的网站目录中创建有*.asp形式的目录，该文件夹下的所有文件都会以asp脚本格式进行解析。</p>
-<h5 id="WebDav漏洞"><a href="#WebDav漏洞" class="headerlink" title="WebDav漏洞"></a>WebDav漏洞</h5><p>WebDav是一种基于HTTP1.1协议的通信协议。在GET、POST、HEAD等HTTP标准方法之外扩展了新方法。</p>
-<p>攻击者可以通过PUT方法向服务器上传危险脚本。</p>
-<h3 id="NGINX篇"><a href="#NGINX篇" class="headerlink" title="NGINX篇"></a>NGINX篇</h3><h5 id="php配置错误导致的解析漏洞"><a href="#php配置错误导致的解析漏洞" class="headerlink" title="php配置错误导致的解析漏洞"></a>php配置错误导致的解析漏洞</h5><p>我们用一个test.jpg（其内容为一句话木马）来构造payload：</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;test.jpg&#x2F;test.php</span><br></pre></td></tr></table></figure>
-
-<p>Nginx在拿到/test.jpg/test.php后，一看后缀是.php，便认为该文件是php文件，转交给php去处理。php一看/test.jpg/test.php不存在，便删去最后的/test.php，又看/test.jpg存在，便把/test.jpg当成要执行的文件了。</p>
-<p>原理是，当打开php的一个选项：cgi.fix_pathinfo，该值默认为1，表示开启。之后，php就对文件路径进行”修理“，当php遇到文件路径“/aaa.xxx/bbb.yyy/ccc.zzz”时，若“/aaa.xxx/bbb.yyy/ccc.zzz”不存在，则会去掉最后的“/ccc.zzz”，然后判断“/aaa.xxx/bbb.yyy”是否存在，若存在，则把“/aaa.xxx/bbb.yyy”当做文件“/aaa.xxx/bbb.yyy/ccc.zzz”，若“/aaa.xxx/bbb.yyy”仍不存在，则继续去掉“/bbb.yyy”，以此类推。</p>
-<p>新版本的php引入了“security.limit_extensions”，限制了可执行文件的后缀，默认只允许执行.php文件。我们可以考虑修改该文件中的“security.limit_extensions”，添加上.jpg，这样php就认为.jpg也是合法的php文件了。</p>
-<h3 id="APACHE篇"><a href="#APACHE篇" class="headerlink" title="APACHE篇"></a>APACHE篇</h3><h4 id="多后缀名"><a href="#多后缀名" class="headerlink" title="多后缀名"></a>多后缀名</h4><p>Apache认为一个文件可以有多个后缀，如：example.php.abc，Apache会从右往左辨别后缀，一开始看到这个abc，不认识所以读到了php, 就把我们输入的这个文件当作了php文件，不再继续往下读。</p>
-<h4 id="换行解析漏洞"><a href="#换行解析漏洞" class="headerlink" title="换行解析漏洞"></a>换行解析漏洞</h4><p>此漏洞的出现是由于apache在修复第一个后缀名解析漏洞时，用正则来匹配后缀。在解析php时<code>xxx.php\x0A</code>将被按照php后缀进行解析，导致绕过一些服务器的安全策略。</p>
-<p>用法是在用burp抓包后在例如<code>1.php</code>后插入以一个<code>\x0A</code>绕过黑名单过滤，访问<code>1.php%0A</code>，即可看到文件被当作php解析。</p>
-<p>此外，文件上传漏洞也经常用于和文件包含漏洞打”组合拳“，也就是先上传恶意代码，再包含上传文件。</p>
-<hr>
-<h1 id="文件上传漏洞防御思路"><a href="#文件上传漏洞防御思路" class="headerlink" title="文件上传漏洞防御思路"></a>文件上传漏洞防御思路</h1><blockquote>
-<p>引自：<a href="http://smallwolf.top/2020/11/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/[%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%94%BB%E5%87%BB%E4%B8%8E%E9%98%B2%E8%8C%83%E6%96%B9%E6%B3%95_m0_38103658%E7%9A%84%E5%8D%9A%E5%AE%A2-CSDN%E5%8D%9A%E5%AE%A2_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E](https://blog.csdn.net/m0_38103658/article/details/100162185?ops_request_misc=%7B%22request_id%22:%22160630266919725271621661%22,%22scm%22:%2220140713.130102334..%22%7D&request_id=160630266919725271621661&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_click~default-5-100162185.pc_first_rank_v2_rank_v28&utm_term=%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E&spm=1018.2118.3001.4449)">美创安全实验室</a></p>
-</blockquote>
-<h2 id="系统运行时的防御"><a href="#系统运行时的防御" class="headerlink" title="系统运行时的防御"></a>系统运行时的防御</h2><ol>
-<li>文件上传的目录设置为不可执行。只要web容器无法解析该目录下面的文件，即使攻击者上传了脚本文件，服务器本身也不会受到影响，因此这一点至关重要。</li>
-<li>判断文件类型。在判断文件类型时，可以结合使用MIME Type、后缀检查等方式。在文<br>件类型检查中，强烈推荐白名单方式，黑名单的方式已经无数次被证明是不可靠的。此外，对于图片的处理，可以使用压缩函数或者resize函数，在处理图片的同时破坏图片中可能包含的HTML代码。</li>
-<li>使用随机数改写文件名和文件路径。文件上传如果要执行代码，则需要用户能够访问到这个文件。在某些环境中，用户能上传，但不能访问。如果应用了随机数改写了文件名和路径，将极大地增加攻击的成本。再来就是像shell.php.rar.rar和crossdomain.xml这种文件，都将因为重命名而无法攻击。</li>
-<li>单独设置文件服务器的域名。由于浏览器同源策略的关系，一系列客户端攻击将失效，比如上传crossdomain.xml、上传包含Javascript的XSS利用等问题将得到解决。</li>
-<li>使用安全设备防御。文件上传攻击的本质就是将恶意文件或者脚本上传到服务器，专业的安全设备防御此类漏洞主要是通过对漏洞的上传利用行为和恶意文件的上传过程进行检测。恶意文件千变万化，隐藏手法也不断推陈出新，对普通的系统管理员来说可以通过部署安全设备来帮助防御。</li>
-</ol>
-<h2 id="系统开发阶段的防御"><a href="#系统开发阶段的防御" class="headerlink" title="系统开发阶段的防御"></a>系统开发阶段的防御</h2><ol>
-<li>系统开发人员应有较强的安全意识，尤其是采用PHP语言开发系统。在系统开发阶段应充分考虑系统的安全性。</li>
-<li>对文件上传漏洞来说，最好能在客户端和服务器端对用户上传的文件名和文件路径等项目分别进行严格的检查。客户端的检查虽然对技术较好的攻击者来说可以借助工具绕过，但是这也可以阻挡一些基本的试探。服务器端的检查最好使用白名单过滤的方法，这样能防止大小写等方式的绕过，同时还需对%00截断符进行检测，对HTTP包头的content-type也和上传文件的大小也需要进行检查。</li>
-</ol>
-<h2 id="系统维护阶段的防御"><a href="#系统维护阶段的防御" class="headerlink" title="系统维护阶段的防御"></a>系统维护阶段的防御</h2><ol>
-<li>系统上线后运维人员应有较强的安全意思，积极使用多个安全检测工具对系统进行安全扫描，及时发现潜在漏洞并修复。</li>
-<li>定时查看系统日志，web服务器日志以发现入侵痕迹。定时关注系统所使用到的第三方插件的更新情况，如有新版本发布建议及时更新，如果第三方插件被爆有安全漏洞更应立即进行修补。</li>
-<li>对于整个网站都是使用的开源代码或者使用网上的框架搭建的网站来说，尤其要注意漏洞的自查和软件版本及补丁的更新，上传功能非必选可以直接删除。除对系统自生的维护外，服务器应进行合理配置，非必选一般的目录都应去掉执行权限，上传目录可配置为只读。</li>
-</ol>
-<h2 id="防护代码参考"><a href="#防护代码参考" class="headerlink" title="防护代码参考"></a>防护代码参考</h2><blockquote>
-<p>引自DVWA中impossible源码</p>
-</blockquote>
-<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( $_POST[ <span class="string">&#x27;Upload&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Check Anti-CSRF token</span></span><br><span class="line">    checkToken( $_REQUEST[ <span class="string">&#x27;user_token&#x27;</span> ], $_SESSION[ <span class="string">&#x27;session_token&#x27;</span> ], <span class="string">&#x27;index.php&#x27;</span> );</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// File information</span></span><br><span class="line">    $uploaded_name = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;name&#x27;</span> ];</span><br><span class="line">    $uploaded_ext  = substr( $uploaded_name, strrpos( $uploaded_name, <span class="string">&#x27;.&#x27;</span> ) + <span class="number">1</span>);</span><br><span class="line">    $uploaded_size = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;size&#x27;</span> ];</span><br><span class="line">    $uploaded_type = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;type&#x27;</span> ];</span><br><span class="line">    $uploaded_tmp  = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;tmp_name&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Where are we going to be writing to?</span></span><br><span class="line">    $target_path   = DVWA_WEB_PAGE_TO_ROOT . <span class="string">&#x27;hackable/uploads/&#x27;</span>;</span><br><span class="line">    <span class="comment">//$target_file   = basename( $uploaded_name, &#x27;.&#x27; . $uploaded_ext ) . &#x27;-&#x27;;</span></span><br><span class="line">    $target_file   =  md5( uniqid() . $uploaded_name ) . <span class="string">&#x27;.&#x27;</span> . $uploaded_ext;</span><br><span class="line">    $temp_file     = ( ( ini_get( <span class="string">&#x27;upload_tmp_dir&#x27;</span> ) == <span class="string">&#x27;&#x27;</span> ) ? ( sys_get_temp_dir() ) : ( ini_get( <span class="string">&#x27;upload_tmp_dir&#x27;</span> ) ) );</span><br><span class="line">    $temp_file    .= DIRECTORY_SEPARATOR . md5( uniqid() . $uploaded_name ) . <span class="string">&#x27;.&#x27;</span> . $uploaded_ext;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Is it an image?</span></span><br><span class="line">    <span class="keyword">if</span>( ( strtolower( $uploaded_ext ) == <span class="string">&#x27;jpg&#x27;</span> || strtolower( $uploaded_ext ) == <span class="string">&#x27;jpeg&#x27;</span> || strtolower( $uploaded_ext ) == <span class="string">&#x27;png&#x27;</span> ) &amp;&amp;</span><br><span class="line">        ( $uploaded_size &lt; <span class="number">100000</span> ) &amp;&amp;</span><br><span class="line">        ( $uploaded_type == <span class="string">&#x27;image/jpeg&#x27;</span> || $uploaded_type == <span class="string">&#x27;image/png&#x27;</span> ) &amp;&amp;</span><br><span class="line">        getimagesize( $uploaded_tmp ) ) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Strip any metadata, by re-encoding image (Note, using php-Imagick is recommended over php-GD)</span></span><br><span class="line">        <span class="keyword">if</span>( $uploaded_type == <span class="string">&#x27;image/jpeg&#x27;</span> ) &#123;</span><br><span class="line">            $img = imagecreatefromjpeg( $uploaded_tmp );</span><br><span class="line">            imagejpeg( $img, $temp_file, <span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            $img = imagecreatefrompng( $uploaded_tmp );</span><br><span class="line">            imagepng( $img, $temp_file, <span class="number">9</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        imagedestroy( $img );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Can we move the file to the web root from the temp folder?</span></span><br><span class="line">        <span class="keyword">if</span>( rename( $temp_file, ( getcwd() . DIRECTORY_SEPARATOR . $target_path . $target_file ) ) ) &#123;</span><br><span class="line">            <span class="comment">// Yes!</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;a href=&#x27;$&#123;target_path&#125;$&#123;target_file&#125;&#x27;&gt;$&#123;target_file&#125;&lt;/a&gt; succesfully uploaded!&lt;/pre&gt;&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// No</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;&lt;pre&gt;Your image was not uploaded.&lt;/pre&gt;&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Delete any temp files</span></span><br><span class="line">        <span class="keyword">if</span>( file_exists( $temp_file ) )</span><br><span class="line">            unlink( $temp_file );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Invalid file</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;&lt;pre&gt;Your image was not uploaded. We can only accept JPEG or PNG images.&lt;/pre&gt;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate Anti-CSRF token</span></span><br><span class="line">generateSessionToken();</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//1. strtolower()函数，对字符串进行小写操作，防止了用大小写绕过</span></span><br><span class="line"><span class="comment">//2. uniqid()函数，基于以微秒计的当前时间，生成一个唯一的ID</span></span><br><span class="line"><span class="comment">//3. $target_file = md5( uniqid() . $uploaded_name ) . ‘.’ . $uploaded_ext;：对上传的文件进行了重命名，为md5值，导致00截断无法绕过过滤规则</span></span><br><span class="line"><span class="comment">//4. 通过imagecreatefromjpeg()和imagecreatefrompng()函数将上传的图片文件重新写入到一个新的图片文件中，这两个函数会自动将图片中的有害元数据抹除，因此即使黑客上传了一张图片马也会被这个函数过滤成一个纯正的图片。</span></span><br><span class="line"><span class="comment">//5. imagedestroy( $img )将用户上传的源文件删除</span></span><br><span class="line"><span class="comment">//6. unlink( $temp_file )删除过滤过程中产生的任何临时文件</span></span><br></pre></td></tr></table></figure>
-
-]]></content>
-      <categories>
-        <category>php</category>
-      </categories>
-  </entry>
-  <entry>
     <title>文件包含漏洞&amp;伪协议总结</title>
     <url>/2021/01/02/php3/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要总结文件包含漏洞和伪协议相关知识。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
@@ -1571,6 +1402,175 @@
 </blockquote>
 <h2 id="ftp"><a href="#ftp" class="headerlink" title="ftp://"></a>ftp://</h2><p>一种提供网络之间共享文件的协议，可以在计算机之间可靠、高效地传送文件。FTP协议包括两个组成部分，其一为FTP服务器，其二为FTP客户端。其中FTP服务器用来存储文件，用户可以使用FTP客户端通过FTP协议访问位于FTP服务器上的资源。在开发网站的时候，通常利用FTP协议把网页或程序传到Web服务器上。</p>
 <p>我们见到的大量CMS系统，也都是通过ftp来进行文件传输的。</p>
+]]></content>
+      <categories>
+        <category>php</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>文件上传漏洞总结</title>
+    <url>/2021/01/02/php2/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文主要总结文件上传漏洞。文中部分内容直接或间接引用于其他大牛的文章中，我都会标明出处，如有侵权，请发邮箱联系我删除。多有不合理之处，望大佬指点。</p>
+<hr>
+<h1 id="漏洞原理"><a href="#漏洞原理" class="headerlink" title="漏洞原理"></a>漏洞原理</h1><p>文件上传漏洞非常常见，是web安全中经常利用的一种漏洞形式。我们经常可以见到在web应用程序中，许多都会允许上传图片、文本或者其他资源到指定的位置，文件上传漏洞就是通过利用这些可以上传的地方，将恶意代码植入到服务器中，再通过url去访问，从而执行代码来达到恶意攻击的目的。造成文件上传漏洞的原因有很多，比如对上传文件的后缀或扩展名没有做较为严格的限制，对于上传文件的<code>MIMETYPE</code>没有做检查，又或者没有限制对于上传的文件的文件权限，都有可能会导致文件上传漏洞。<a id="more"></a></p>
+<hr>
+<h1 id="漏洞常见类型"><a href="#漏洞常见类型" class="headerlink" title="漏洞常见类型"></a>漏洞常见类型</h1><h2 id="基于文件校验的漏洞"><a href="#基于文件校验的漏洞" class="headerlink" title="基于文件校验的漏洞"></a>基于文件校验的漏洞</h2><h3 id="客户端检测"><a href="#客户端检测" class="headerlink" title="客户端检测"></a>客户端检测</h3><h4 id="js前端验证"><a href="#js前端验证" class="headerlink" title="js前端验证"></a>js前端验证</h4><p>前端一般会用JS函数来验证上传文件的扩展名之类的操作，相比起安全措施，这更像是一种防止用户上传操作失误的措施，我们直接删除掉JS代码，或者使用burp一类的工具进行改包，就可以绕过这类验证。</p>
+<h3 id="服务端检测"><a href="#服务端检测" class="headerlink" title="服务端检测"></a>服务端检测</h3><h4 id="检查后缀-扩展名"><a href="#检查后缀-扩展名" class="headerlink" title="检查后缀/扩展名"></a>检查后缀/扩展名</h4><p>对于在服务端进行扩展名检查的，一般分为两种：黑名单和白名单，其中后者相对更安全一点，不容易出现疏漏。</p>
+<h5 id="黑名单"><a href="#黑名单" class="headerlink" title="黑名单"></a>黑名单</h5><h5 id="寻找可解析后缀"><a href="#寻找可解析后缀" class="headerlink" title="寻找可解析后缀"></a>寻找可解析后缀</h5><p>利用burpsuite工具截断HTTP请求，利用intruder模块进行枚举后缀名，来寻找黑名单中是否存在没有过滤到的后缀名。</p>
+<p>常见的可解析后缀名有：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&quot;.php&quot;,&quot;.php5&quot;,&quot;.php4&quot;,&quot;.php3&quot;,&quot;.php2&quot;,&quot;.php1&quot;,&quot;.html&quot;,&quot;.htm&quot;,&quot;.phtml&quot;,&quot;.pht&quot;,&quot;.pHp&quot;,&quot;.pHp5&quot;,&quot;.pHp4&quot;,&quot;.pHp3&quot;,&quot;.pHp2&quot;,&quot;.pHp1&quot;,&quot;.Html&quot;,&quot;.Htm&quot;,&quot;.pHtml&quot;,&quot;.jsp&quot;,&quot;.jspa&quot;,&quot;.jspx&quot;,&quot;.jsw&quot;,&quot;.jsv&quot;,&quot;.jspf&quot;,&quot;.jtml&quot;,&quot;.jSp&quot;,&quot;.jSpx&quot;,&quot;.jSpa&quot;,&quot;.jSw&quot;,&quot;.jSv&quot;,&quot;.jSpf&quot;,&quot;.jHtml&quot;,&quot;.asp&quot;,&quot;.aspx&quot;,&quot;.asa&quot;,&quot;.asax&quot;,&quot;.ascx&quot;,&quot;.ashx&quot;,&quot;.asmx&quot;,&quot;.cer&quot;,&quot;.aSp&quot;,&quot;.aSpx&quot;,&quot;.aSa&quot;,&quot;.aSax&quot;,&quot;.aScx&quot;,&quot;.aShx&quot;,&quot;.aSmx&quot;,&quot;.cEr&quot;,&quot;.sWf&quot;,&quot;.swf&quot;,&quot;.ini&quot;</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="htaccess"><a href="#htaccess" class="headerlink" title=".htaccess"></a><code>.htaccess</code></h5><blockquote>
+<p>.htaccess文件是Apache服务器中的一个配置文件，它负责相关目录下的网页配置.通过htaccess文件，可以实现:网页301重定向、自定义404页面、改变文件扩展名、允许/阻止特定的用户或者目录的访问、禁止目录列表、配置默认文档等功能。</p>
+<p>在apache中，如果需要启动.htaccess，必须在http.conf中设置AllowOverride为All。</p>
+</blockquote>
+<p>如果我们上传一个<code>.htaccess</code>，其内容为：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">SetHandler application&#x2F;x-httpd-php</span><br></pre></td></tr></table></figure>
+
+<p>这样的话所有文件都会被解析为php。</p>
+<p>注意由于直接创建txt文档会显示必须键入文件名，所以可以采用cmd命令方式来生成<code>.htaccess</code>。</p>
+<h5 id="利用各类符号绕过后缀名"><a href="#利用各类符号绕过后缀名" class="headerlink" title="利用各类符号绕过后缀名"></a>利用各类符号绕过后缀名</h5><p>当这些后缀都被拉入黑名单时，我们可以考虑用大小写、双写、点号等方式来绕过。大小写、双写、结尾加空格等常规方式就不再赘述，主要说一下点绕过、<code>::$DATA</code>绕过、路径拼接绕过这些绕过方法。</p>
+<h6 id="点绕过"><a href="#点绕过" class="headerlink" title="点绕过"></a>点绕过</h6><p>windows系统下，后缀名的最后一个点会被自动删除掉，所以可以通过在结尾加一个点的方式绕过黑名单。</p>
+<h6 id="DATA绕过"><a href="#DATA绕过" class="headerlink" title="::$DATA绕过"></a><code>::$DATA</code>绕过</h6><blockquote>
+<p>是Windows下NTFS文件系统的一个特性，即NTFS文件系统的存储数据流的一个属性 DATA 时，就是请求 <code>a.asp</code> 本身的数据，如果a.asp 还包含了其他的数据流，比如 <code>a.asp:lake2.asp</code>，请求 <code>a.asp:lake2.asp::$DATA</code>，则是请求<code>a.asp</code>中的流数据<code>lake2.asp</code>的流数据内容。</p>
+</blockquote>
+<p>因此我们在后缀名中添加<code>::$DATA</code>即可绕过。</p>
+<p>注意要在Linux下修改文件名，因为在Windows下创建不了。</p>
+<h6 id="路径拼接绕过"><a href="#路径拼接绕过" class="headerlink" title="路径拼接绕过"></a>路径拼接绕过</h6><p>示例：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        $deny_ext = <span class="keyword">array</span>(<span class="string">&quot;.php&quot;</span>,<span class="string">&quot;.php5&quot;</span>,<span class="string">&quot;.php4&quot;</span>,<span class="string">&quot;.php3&quot;</span>,<span class="string">&quot;.php2&quot;</span>,<span class="string">&quot;.html&quot;</span>,<span class="string">&quot;.htm&quot;</span>,<span class="string">&quot;.phtml&quot;</span>,<span class="string">&quot;.pht&quot;</span>,<span class="string">&quot;.pHp&quot;</span>,<span class="string">&quot;.pHp5&quot;</span>,<span class="string">&quot;.pHp4&quot;</span>,<span class="string">&quot;.pHp3&quot;</span>,<span class="string">&quot;.pHp2&quot;</span>,<span class="string">&quot;.Html&quot;</span>,<span class="string">&quot;.Htm&quot;</span>,<span class="string">&quot;.pHtml&quot;</span>,<span class="string">&quot;.jsp&quot;</span>,<span class="string">&quot;.jspa&quot;</span>,<span class="string">&quot;.jspx&quot;</span>,<span class="string">&quot;.jsw&quot;</span>,<span class="string">&quot;.jsv&quot;</span>,<span class="string">&quot;.jspf&quot;</span>,<span class="string">&quot;.jtml&quot;</span>,<span class="string">&quot;.jSp&quot;</span>,<span class="string">&quot;.jSpx&quot;</span>,<span class="string">&quot;.jSpa&quot;</span>,<span class="string">&quot;.jSw&quot;</span>,<span class="string">&quot;.jSv&quot;</span>,<span class="string">&quot;.jSpf&quot;</span>,<span class="string">&quot;.jHtml&quot;</span>,<span class="string">&quot;.asp&quot;</span>,<span class="string">&quot;.aspx&quot;</span>,<span class="string">&quot;.asa&quot;</span>,<span class="string">&quot;.asax&quot;</span>,<span class="string">&quot;.ascx&quot;</span>,<span class="string">&quot;.ashx&quot;</span>,<span class="string">&quot;.asmx&quot;</span>,<span class="string">&quot;.cer&quot;</span>,<span class="string">&quot;.aSp&quot;</span>,<span class="string">&quot;.aSpx&quot;</span>,<span class="string">&quot;.aSa&quot;</span>,<span class="string">&quot;.aSax&quot;</span>,<span class="string">&quot;.aScx&quot;</span>,<span class="string">&quot;.aShx&quot;</span>,<span class="string">&quot;.aSmx&quot;</span>,<span class="string">&quot;.cEr&quot;</span>,<span class="string">&quot;.sWf&quot;</span>,<span class="string">&quot;.swf&quot;</span>,<span class="string">&quot;.htaccess&quot;</span>);</span><br><span class="line">        $file_name = trim($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>]);</span><br><span class="line">        $file_name = deldot($file_name);<span class="comment">//删除文件名末尾的点</span></span><br><span class="line">        $file_ext = strrchr($file_name, <span class="string">&#x27;.&#x27;</span>);</span><br><span class="line">        $file_ext = strtolower($file_ext); <span class="comment">//转换为小写</span></span><br><span class="line">        $file_ext = str_ireplace(<span class="string">&#x27;::$DATA&#x27;</span>, <span class="string">&#x27;&#x27;</span>, $file_ext);<span class="comment">//去除字符串::$DATA</span></span><br><span class="line">        $file_ext = trim($file_ext); <span class="comment">//首尾去空</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (!in_array($file_ext, $deny_ext)) &#123;</span><br><span class="line">            $temp_file = $_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            $img_path = UPLOAD_PATH.<span class="string">&#x27;/&#x27;</span>.$file_name;</span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file($temp_file, $img_path)) &#123;</span><br><span class="line">                $is_upload = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $msg = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $msg = <span class="string">&#x27;此文件类型不允许上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $msg = UPLOAD_PATH . <span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到这里对文件名进行了处理，删除了文件名末尾的点，并且把处理过的文件名拼接到路径中。</p>
+<p>这里我们就可以将文件名构造为  <code>1.php. .</code>  （点+空格+点），这样在路径拼接之后，文件名就会变成<code>1.php</code>，从而成功绕过。</p>
+<h5 id="白名单"><a href="#白名单" class="headerlink" title="白名单"></a>白名单</h5><h5 id="MIME绕过"><a href="#MIME绕过" class="headerlink" title="MIME绕过"></a>MIME绕过</h5><blockquote>
+<p>MIME（Multipurpose Internet Mail Extensions）多用途互联网邮件扩展类型。是设定某种扩展名的文件用一种应用程序来打开的方式类型，当改扩展名文件被访问的时候，浏览器会自动使用指定应用程序来打开，多用于指定一些客户端自定义的文件夹，以及一些媒体文件打开方式。</p>
+</blockquote>
+<p>我们来看一个示例：</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>($_POST[<span class="string">&#x27;submit&#x27;</span>])) &#123;</span><br><span class="line">    <span class="keyword">if</span> (file_exists(UPLOAD_PATH)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;type&#x27;</span>] == <span class="string">&#x27;image/jpeg&#x27;</span>) || ($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;type&#x27;</span>] == <span class="string">&#x27;image/png&#x27;</span>) || ($_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;type&#x27;</span>] == <span class="string">&#x27;image/gif&#x27;</span>)) &#123;</span><br><span class="line">            $temp_file = $_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;tmp_name&#x27;</span>];</span><br><span class="line">            $img_path = UPLOAD_PATH . <span class="string">&#x27;/&#x27;</span> . $_FILES[<span class="string">&#x27;upload_file&#x27;</span>][<span class="string">&#x27;name&#x27;</span>];          </span><br><span class="line">            <span class="keyword">if</span> (move_uploaded_file($temp_file, $img_path)) &#123;</span><br><span class="line">                $is_upload = <span class="literal">true</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                $msg = <span class="string">&#x27;上传出错！&#x27;</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            $msg = <span class="string">&#x27;文件类型不正确，请重新上传！&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $msg = UPLOAD_PATH.<span class="string">&#x27;文件夹不存在,请手工创建！&#x27;</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这里我们检查<code>Content-type</code>，burp抓包修改其类型即可绕过。</p>
+<p>  <code>Content-type</code>常见类型见下：</p>
+<table>
+<thead>
+<tr>
+<th>文件类型</th>
+<th>Content-type</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>超文本标记语言文本</td>
+<td>.html,.html text/html</td>
+</tr>
+<tr>
+<td>普通文本</td>
+<td>.txt text/plain</td>
+</tr>
+<tr>
+<td>RTF文本</td>
+<td>.txt text/plain</td>
+</tr>
+<tr>
+<td>GIF图形</td>
+<td>.gif image/gif</td>
+</tr>
+<tr>
+<td>JPEG图形</td>
+<td>.jpeg,.jpg image/jpeg</td>
+</tr>
+<tr>
+<td>au声音文件</td>
+<td>.au audio/basic</td>
+</tr>
+<tr>
+<td>MIDI音乐文件</td>
+<td>.mid,.midi audio/midi,audio/x-midi</td>
+</tr>
+<tr>
+<td>RealAudio音乐文件</td>
+<td>.ra, .ram audio/x-pn-realaudio</td>
+</tr>
+<tr>
+<td>MPEG文件</td>
+<td>.mpg,.mpeg video/mpeg</td>
+</tr>
+<tr>
+<td>AVI文件</td>
+<td>.avi video/x-msvideo</td>
+</tr>
+<tr>
+<td>GZIP文件</td>
+<td>.gz application/x-gzip</td>
+</tr>
+<tr>
+<td>TAR文件</td>
+<td>.tar application/x-tar</td>
+</tr>
+</tbody></table>
+<h5 id="00截断"><a href="#00截断" class="headerlink" title="00截断"></a>00截断</h5><p>00截断是很常见的截断方法，原理是有些函数处理时，会把这个字符当作结束符。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">截断条件：php版本小于5.3.4，php的magic_quotes_gpc为OFF状态</span><br></pre></td></tr></table></figure>
+
+<p>如：1.php0x00.jpg</p>
+<p>值得注意的是，在GET型00截断中，我们要使用<code>%00</code>来截断，因为GET型提交的内容会被自动进行URL解码；而在POST型00截断中，<code>%00</code>是不会被自动解码的，我们需要在16进制中对其进行修改，将其改为00即可截断。</p>
+<h4 id="检查内容"><a href="#检查内容" class="headerlink" title="检查内容"></a>检查内容</h4><h5 id="文件幻数-文件头检测"><a href="#文件幻数-文件头检测" class="headerlink" title="文件幻数/文件头检测"></a>文件幻数/文件头检测</h5><p>文件幻数是用来唯一标识文件类型的一系列数字（十六进制），也就是我们常说的文件头，当白名单限制了文件幻数时，我们就要给我们的文件制造可以过关的文件头：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.jpg	Value &#x3D; FF D8 FF E0 </span><br><span class="line">.gif	Value &#x3D; 47 49 46 38</span><br><span class="line">.png	Value &#x3D; 89 50 4E 47</span><br><span class="line">.html	Value &#x3D; 68 74 6D 6C 3E 10</span><br><span class="line">.xml	Value &#x3D; 3C 3F 78 6D 6C</span><br></pre></td></tr></table></figure>
+
+<p>然后在文件幻数之后加上我们要的木马就好了。</p>
+<h5 id="制作图片马"><a href="#制作图片马" class="headerlink" title="制作图片马"></a>制作图片马</h5><p>当服务端会对文件进行加载测试、渲染测试时，我们就可以将我们的代码注入到图片中，这样就不会破坏文件的格式，从而在白名单允许的图片格式范围内成功插入php代码，然后再利用文件包含来执行该代码。</p>
+<p>一句话木马（webshell）中常用的危险函数有<code>eval()</code> 、 <code>assert()</code> 、 <code>preg_replace()</code> ：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpupdate/1.png"></p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpupdate/2.png"></p>
+<p>制作方法：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/jiulin23/image@2.2.3/php/phpupdate/3.png"></p>
+<blockquote>
+<p>​    文件包含漏洞请见：<a href="https://jiulin.space/2021/01/02/php3/#more">https://jiulin.space/2021/01/02/php3/#more</a></p>
+</blockquote>
+<h2 id="基于文件处理的漏洞"><a href="#基于文件处理的漏洞" class="headerlink" title="基于文件处理的漏洞"></a>基于文件处理的漏洞</h2><h3 id="条件竞争"><a href="#条件竞争" class="headerlink" title="条件竞争"></a>条件竞争</h3><p>当网站的文件上传的过程是：<code>服务器获取文件–&gt;保存上传临时文件–&gt;重命名移动临时文件</code> 这样的步骤时，</p>
+<p>我们就可以使用条件竞争来进行绕过，通过不断地对文件进行上传和打开，从而使服务器还未重命名移动临时文件时，我们就利用时间差打开了文件，成功执行其中的php代码。</p>
+<p>具体方法：我们可以利用burp不断发包来进行条件竞争，也可以通过python脚本来反复发送请求得到结果。 </p>
+<h3 id="二次渲染"><a href="#二次渲染" class="headerlink" title="二次渲染"></a>二次渲染</h3><blockquote>
+<p>二次渲染，相当于把原本属于图像数据的部分抓了出来，再用自己的API 或函数进行重新渲染。在该过程中，非图像数据的部分与图像数据会被隔离开。</p>
+</blockquote>
+<p>方法也很简单，我们在十六进制中寻找二次渲染并未改变的部分，在其中插入php代码就好了。</p>
+<h2 id="基于文件解析的漏洞"><a href="#基于文件解析的漏洞" class="headerlink" title="基于文件解析的漏洞"></a>基于文件解析的漏洞</h2><h3 id="IIS篇"><a href="#IIS篇" class="headerlink" title="IIS篇"></a>IIS篇</h3><h4 id="；截断"><a href="#；截断" class="headerlink" title="；截断"></a>；截断</h4><p>当文件名为abc.asp;xx.jpg时，IIS6会将此文件解析成abc.asp，文件名被截断了，从而导致脚本被执行。</p>
+<h4 id="处理文件夹拓展名出错"><a href="#处理文件夹拓展名出错" class="headerlink" title="处理文件夹拓展名出错"></a>处理文件夹拓展名出错</h4><p>在IIS6.0的网站目录中创建有*.asp形式的目录，该文件夹下的所有文件都会以asp脚本格式进行解析。</p>
+<h5 id="WebDav漏洞"><a href="#WebDav漏洞" class="headerlink" title="WebDav漏洞"></a>WebDav漏洞</h5><p>WebDav是一种基于HTTP1.1协议的通信协议。在GET、POST、HEAD等HTTP标准方法之外扩展了新方法。</p>
+<p>攻击者可以通过PUT方法向服务器上传危险脚本。</p>
+<h3 id="NGINX篇"><a href="#NGINX篇" class="headerlink" title="NGINX篇"></a>NGINX篇</h3><h5 id="php配置错误导致的解析漏洞"><a href="#php配置错误导致的解析漏洞" class="headerlink" title="php配置错误导致的解析漏洞"></a>php配置错误导致的解析漏洞</h5><p>我们用一个test.jpg（其内容为一句话木马）来构造payload：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">http:&#x2F;&#x2F;127.0.0.1&#x2F;test.jpg&#x2F;test.php</span><br></pre></td></tr></table></figure>
+
+<p>Nginx在拿到/test.jpg/test.php后，一看后缀是.php，便认为该文件是php文件，转交给php去处理。php一看/test.jpg/test.php不存在，便删去最后的/test.php，又看/test.jpg存在，便把/test.jpg当成要执行的文件了。</p>
+<p>原理是，当打开php的一个选项：cgi.fix_pathinfo，该值默认为1，表示开启。之后，php就对文件路径进行”修理“，当php遇到文件路径“/aaa.xxx/bbb.yyy/ccc.zzz”时，若“/aaa.xxx/bbb.yyy/ccc.zzz”不存在，则会去掉最后的“/ccc.zzz”，然后判断“/aaa.xxx/bbb.yyy”是否存在，若存在，则把“/aaa.xxx/bbb.yyy”当做文件“/aaa.xxx/bbb.yyy/ccc.zzz”，若“/aaa.xxx/bbb.yyy”仍不存在，则继续去掉“/bbb.yyy”，以此类推。</p>
+<p>新版本的php引入了“security.limit_extensions”，限制了可执行文件的后缀，默认只允许执行.php文件。我们可以考虑修改该文件中的“security.limit_extensions”，添加上.jpg，这样php就认为.jpg也是合法的php文件了。</p>
+<h3 id="APACHE篇"><a href="#APACHE篇" class="headerlink" title="APACHE篇"></a>APACHE篇</h3><h4 id="多后缀名"><a href="#多后缀名" class="headerlink" title="多后缀名"></a>多后缀名</h4><p>Apache认为一个文件可以有多个后缀，如：example.php.abc，Apache会从右往左辨别后缀，一开始看到这个abc，不认识所以读到了php, 就把我们输入的这个文件当作了php文件，不再继续往下读。</p>
+<h4 id="换行解析漏洞"><a href="#换行解析漏洞" class="headerlink" title="换行解析漏洞"></a>换行解析漏洞</h4><p>此漏洞的出现是由于apache在修复第一个后缀名解析漏洞时，用正则来匹配后缀。在解析php时<code>xxx.php\x0A</code>将被按照php后缀进行解析，导致绕过一些服务器的安全策略。</p>
+<p>用法是在用burp抓包后在例如<code>1.php</code>后插入以一个<code>\x0A</code>绕过黑名单过滤，访问<code>1.php%0A</code>，即可看到文件被当作php解析。</p>
+<p>此外，文件上传漏洞也经常用于和文件包含漏洞打”组合拳“，也就是先上传恶意代码，再包含上传文件。</p>
+<hr>
+<h1 id="文件上传漏洞防御思路"><a href="#文件上传漏洞防御思路" class="headerlink" title="文件上传漏洞防御思路"></a>文件上传漏洞防御思路</h1><blockquote>
+<p>引自：<a href="http://smallwolf.top/2020/11/27/%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/[%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E6%94%BB%E5%87%BB%E4%B8%8E%E9%98%B2%E8%8C%83%E6%96%B9%E6%B3%95_m0_38103658%E7%9A%84%E5%8D%9A%E5%AE%A2-CSDN%E5%8D%9A%E5%AE%A2_%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E](https://blog.csdn.net/m0_38103658/article/details/100162185?ops_request_misc=%7B%22request_id%22:%22160630266919725271621661%22,%22scm%22:%2220140713.130102334..%22%7D&request_id=160630266919725271621661&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_click~default-5-100162185.pc_first_rank_v2_rank_v28&utm_term=%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E&spm=1018.2118.3001.4449)">美创安全实验室</a></p>
+</blockquote>
+<h2 id="系统运行时的防御"><a href="#系统运行时的防御" class="headerlink" title="系统运行时的防御"></a>系统运行时的防御</h2><ol>
+<li>文件上传的目录设置为不可执行。只要web容器无法解析该目录下面的文件，即使攻击者上传了脚本文件，服务器本身也不会受到影响，因此这一点至关重要。</li>
+<li>判断文件类型。在判断文件类型时，可以结合使用MIME Type、后缀检查等方式。在文<br>件类型检查中，强烈推荐白名单方式，黑名单的方式已经无数次被证明是不可靠的。此外，对于图片的处理，可以使用压缩函数或者resize函数，在处理图片的同时破坏图片中可能包含的HTML代码。</li>
+<li>使用随机数改写文件名和文件路径。文件上传如果要执行代码，则需要用户能够访问到这个文件。在某些环境中，用户能上传，但不能访问。如果应用了随机数改写了文件名和路径，将极大地增加攻击的成本。再来就是像shell.php.rar.rar和crossdomain.xml这种文件，都将因为重命名而无法攻击。</li>
+<li>单独设置文件服务器的域名。由于浏览器同源策略的关系，一系列客户端攻击将失效，比如上传crossdomain.xml、上传包含Javascript的XSS利用等问题将得到解决。</li>
+<li>使用安全设备防御。文件上传攻击的本质就是将恶意文件或者脚本上传到服务器，专业的安全设备防御此类漏洞主要是通过对漏洞的上传利用行为和恶意文件的上传过程进行检测。恶意文件千变万化，隐藏手法也不断推陈出新，对普通的系统管理员来说可以通过部署安全设备来帮助防御。</li>
+</ol>
+<h2 id="系统开发阶段的防御"><a href="#系统开发阶段的防御" class="headerlink" title="系统开发阶段的防御"></a>系统开发阶段的防御</h2><ol>
+<li>系统开发人员应有较强的安全意识，尤其是采用PHP语言开发系统。在系统开发阶段应充分考虑系统的安全性。</li>
+<li>对文件上传漏洞来说，最好能在客户端和服务器端对用户上传的文件名和文件路径等项目分别进行严格的检查。客户端的检查虽然对技术较好的攻击者来说可以借助工具绕过，但是这也可以阻挡一些基本的试探。服务器端的检查最好使用白名单过滤的方法，这样能防止大小写等方式的绕过，同时还需对%00截断符进行检测，对HTTP包头的content-type也和上传文件的大小也需要进行检查。</li>
+</ol>
+<h2 id="系统维护阶段的防御"><a href="#系统维护阶段的防御" class="headerlink" title="系统维护阶段的防御"></a>系统维护阶段的防御</h2><ol>
+<li>系统上线后运维人员应有较强的安全意思，积极使用多个安全检测工具对系统进行安全扫描，及时发现潜在漏洞并修复。</li>
+<li>定时查看系统日志，web服务器日志以发现入侵痕迹。定时关注系统所使用到的第三方插件的更新情况，如有新版本发布建议及时更新，如果第三方插件被爆有安全漏洞更应立即进行修补。</li>
+<li>对于整个网站都是使用的开源代码或者使用网上的框架搭建的网站来说，尤其要注意漏洞的自查和软件版本及补丁的更新，上传功能非必选可以直接删除。除对系统自生的维护外，服务器应进行合理配置，非必选一般的目录都应去掉执行权限，上传目录可配置为只读。</li>
+</ol>
+<h2 id="防护代码参考"><a href="#防护代码参考" class="headerlink" title="防护代码参考"></a>防护代码参考</h2><blockquote>
+<p>引自DVWA中impossible源码</p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span>( <span class="keyword">isset</span>( $_POST[ <span class="string">&#x27;Upload&#x27;</span> ] ) ) &#123;</span><br><span class="line">    <span class="comment">// Check Anti-CSRF token</span></span><br><span class="line">    checkToken( $_REQUEST[ <span class="string">&#x27;user_token&#x27;</span> ], $_SESSION[ <span class="string">&#x27;session_token&#x27;</span> ], <span class="string">&#x27;index.php&#x27;</span> );</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">// File information</span></span><br><span class="line">    $uploaded_name = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;name&#x27;</span> ];</span><br><span class="line">    $uploaded_ext  = substr( $uploaded_name, strrpos( $uploaded_name, <span class="string">&#x27;.&#x27;</span> ) + <span class="number">1</span>);</span><br><span class="line">    $uploaded_size = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;size&#x27;</span> ];</span><br><span class="line">    $uploaded_type = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;type&#x27;</span> ];</span><br><span class="line">    $uploaded_tmp  = $_FILES[ <span class="string">&#x27;uploaded&#x27;</span> ][ <span class="string">&#x27;tmp_name&#x27;</span> ];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Where are we going to be writing to?</span></span><br><span class="line">    $target_path   = DVWA_WEB_PAGE_TO_ROOT . <span class="string">&#x27;hackable/uploads/&#x27;</span>;</span><br><span class="line">    <span class="comment">//$target_file   = basename( $uploaded_name, &#x27;.&#x27; . $uploaded_ext ) . &#x27;-&#x27;;</span></span><br><span class="line">    $target_file   =  md5( uniqid() . $uploaded_name ) . <span class="string">&#x27;.&#x27;</span> . $uploaded_ext;</span><br><span class="line">    $temp_file     = ( ( ini_get( <span class="string">&#x27;upload_tmp_dir&#x27;</span> ) == <span class="string">&#x27;&#x27;</span> ) ? ( sys_get_temp_dir() ) : ( ini_get( <span class="string">&#x27;upload_tmp_dir&#x27;</span> ) ) );</span><br><span class="line">    $temp_file    .= DIRECTORY_SEPARATOR . md5( uniqid() . $uploaded_name ) . <span class="string">&#x27;.&#x27;</span> . $uploaded_ext;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Is it an image?</span></span><br><span class="line">    <span class="keyword">if</span>( ( strtolower( $uploaded_ext ) == <span class="string">&#x27;jpg&#x27;</span> || strtolower( $uploaded_ext ) == <span class="string">&#x27;jpeg&#x27;</span> || strtolower( $uploaded_ext ) == <span class="string">&#x27;png&#x27;</span> ) &amp;&amp;</span><br><span class="line">        ( $uploaded_size &lt; <span class="number">100000</span> ) &amp;&amp;</span><br><span class="line">        ( $uploaded_type == <span class="string">&#x27;image/jpeg&#x27;</span> || $uploaded_type == <span class="string">&#x27;image/png&#x27;</span> ) &amp;&amp;</span><br><span class="line">        getimagesize( $uploaded_tmp ) ) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Strip any metadata, by re-encoding image (Note, using php-Imagick is recommended over php-GD)</span></span><br><span class="line">        <span class="keyword">if</span>( $uploaded_type == <span class="string">&#x27;image/jpeg&#x27;</span> ) &#123;</span><br><span class="line">            $img = imagecreatefromjpeg( $uploaded_tmp );</span><br><span class="line">            imagejpeg( $img, $temp_file, <span class="number">100</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            $img = imagecreatefrompng( $uploaded_tmp );</span><br><span class="line">            imagepng( $img, $temp_file, <span class="number">9</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        imagedestroy( $img );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Can we move the file to the web root from the temp folder?</span></span><br><span class="line">        <span class="keyword">if</span>( rename( $temp_file, ( getcwd() . DIRECTORY_SEPARATOR . $target_path . $target_file ) ) ) &#123;</span><br><span class="line">            <span class="comment">// Yes!</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&quot;&lt;pre&gt;&lt;a href=&#x27;$&#123;target_path&#125;$&#123;target_file&#125;&#x27;&gt;$&#123;target_file&#125;&lt;/a&gt; succesfully uploaded!&lt;/pre&gt;&quot;</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// No</span></span><br><span class="line">            <span class="keyword">echo</span> <span class="string">&#x27;&lt;pre&gt;Your image was not uploaded.&lt;/pre&gt;&#x27;</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Delete any temp files</span></span><br><span class="line">        <span class="keyword">if</span>( file_exists( $temp_file ) )</span><br><span class="line">            unlink( $temp_file );</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// Invalid file</span></span><br><span class="line">        <span class="keyword">echo</span> <span class="string">&#x27;&lt;pre&gt;Your image was not uploaded. We can only accept JPEG or PNG images.&lt;/pre&gt;&#x27;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generate Anti-CSRF token</span></span><br><span class="line">generateSessionToken();</span><br><span class="line"></span><br><span class="line"><span class="meta">?&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//1. strtolower()函数，对字符串进行小写操作，防止了用大小写绕过</span></span><br><span class="line"><span class="comment">//2. uniqid()函数，基于以微秒计的当前时间，生成一个唯一的ID</span></span><br><span class="line"><span class="comment">//3. $target_file = md5( uniqid() . $uploaded_name ) . ‘.’ . $uploaded_ext;：对上传的文件进行了重命名，为md5值，导致00截断无法绕过过滤规则</span></span><br><span class="line"><span class="comment">//4. 通过imagecreatefromjpeg()和imagecreatefrompng()函数将上传的图片文件重新写入到一个新的图片文件中，这两个函数会自动将图片中的有害元数据抹除，因此即使黑客上传了一张图片马也会被这个函数过滤成一个纯正的图片。</span></span><br><span class="line"><span class="comment">//5. imagedestroy( $img )将用户上传的源文件删除</span></span><br><span class="line"><span class="comment">//6. unlink( $temp_file )删除过滤过程中产生的任何临时文件</span></span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
         <category>php</category>
